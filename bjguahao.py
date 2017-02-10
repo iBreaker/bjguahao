@@ -7,9 +7,13 @@ import time
 import cookielib
 import urllib2
 
-mobileNo = "136xxx"
-password = "xxx"
-date = "2017-02-16"
+mobileNo = "136xxx"  #账号
+password = "xxx"   #密码
+date = "2017-02-17"       #挂号日期
+
+hospitalId = 142          #北医三院
+departmentId = 200039584  #运动医学
+
 
 def add_header(request):
     request.add_header('User-Agent', "Mozilla/5.0 (Windows NT 6.1; WOW64;")
@@ -47,21 +51,35 @@ def send_msg_code(urlOpener):
         else:
             print msg
             time.sleep(10)
-
+"""
+-1 号没有放出，或者今天没号
+-2 号被预约完了
+"""
 def get_ids(urlOpener):
     url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
-    data = "hospitalId=142&departmentId=200039674&dutyCode=1&dutyDate=" + date + "&isAjax=true"
+    data = "hospitalId=" + str(hospitalId) +                \
+           "&departmentId=" + str(departmentId) +           \
+           "&dutyCode=1&dutyDate=" + date + "&isAjax=true"
     request = urllib2.Request(url, data)
     request = add_header(request)
     ret = urlOpener.open(request).read()
     msg = json.loads(ret)
-    doctorId =  msg['data'][0]['doctorId']
-    dutySourceId = msg['data'][0]['dutySourceId']
-    return { "dutySourceId": dutySourceId, "doctorId": doctorId}
+    if len(msg['data']) == 0:
+        return -1
+
+    # 越往后水平越高
+    for doctor in msg['data'][::-1]:
+        if doctor['remainAvailableNumber']:
+            print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
+            return { "dutySourceId": doctor['dutySourceId'], "doctorId": doctor['doctorId']}
+    for doctor in msg['data'][::-1]:
+        print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
+    return -2
 
 def gen_url(ids):
-    return "http://www.bjguahao.gov.cn/order/confirm/142-200039674-" + \
-           str(ids['doctorId']) + "-" + str(ids['dutySourceId']) + ".htm"
+    return "http://www.bjguahao.gov.cn/order/confirm/" + str(hospitalId) + \
+           "-" + str(departmentId) + "-" + str(ids['doctorId']) + "-" +   \
+           str(ids['dutySourceId']) + ".htm"
 
 def get_patientId(urlOpener, ids):
     url = gen_url(ids)
@@ -85,24 +103,38 @@ def get_patientId(urlOpener, ids):
 """
 def fuck(urlOpener, ids, patientId, msg_code):
     url = "http://www.bjguahao.gov.cn/order/confirm.htm"
-    data = "dutySourceId=" + str(ids['dutySourceId']) +                            \
-           "&hospitalId=142&departmentId=200039674&doctorId=" +                    \
-           str(ids['doctorId']) + "&patientId=" + str(patientId) +                 \
-           "&hospitalCardId=&medicareCardId=&reimbursementType=1&smsVerifyCode=" + \
+    data = "dutySourceId=" + str(ids['dutySourceId']) +                              \
+           "&hospitalId=" + str(hospitalId) + "&departmentId=" + str(departmentId) + \
+           "&doctorId=" + str(ids['doctorId']) + "&patientId=" + str(patientId) +    \
+           "&hospitalCardId=&medicareCardId=&reimbursementType=1&smsVerifyCode=" +   \
            msg_code + "&childrenBirthday=&isAjax=true"
 
     request = urllib2.Request(url, data)
     request = add_header(request)
     ret = urlOpener.open(request).read()
     msg = json.loads(ret)
-    print msg['msg']
+    if msg['msg'] == "OK":
+        print "恭喜, 挂号成功:)"
+    else:
+        print msg['msg']
 
 def main():
     urlOpener = auth_login()
-    ids = get_ids(urlOpener)
-    patientId = get_patientId(urlOpener, ids)
     send_msg_code(urlOpener)
-    msg_code = raw_input("input: ")
-    fuck(urlOpener, ids, patientId, msg_code)
+    while True:
+        while True:
+            ids = get_ids(urlOpener)
+            if ids == -2:
+                exit("今天没有号了")
+            elif ids == -1:
+                print "号还放出, 等待..."
+                time.sleep(5)         #号还没有产生，sleep 5秒
+                continue
+            else:
+                break
+        patientId = get_patientId(urlOpener, ids)
+        msg_code = raw_input("输入短信验证码: ")
+        fuck(urlOpener, ids, patientId, msg_code)
+        send_msg_code(urlOpener)
 
 main()
