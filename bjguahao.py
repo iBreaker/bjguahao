@@ -1,5 +1,8 @@
-#!/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8
+"""
+北京市预约挂号统一平台
+"""
 
 import re
 import json
@@ -93,7 +96,7 @@ def get_patientId(urlOpener, ids):
         return m.group(1)
 
 """
-@dutySourceId   病号id        
+@dutySourceId   病号id
 @hospitalId     医院id  默认: 北医三院
 @departmentId   科室id  默认: 运动医学(特需)
 @doctorId       医生id
@@ -119,6 +122,9 @@ def fuck(urlOpener, ids, patientId, msg_code):
         print msg['msg']
 
 def main():
+    """
+    主函数 负责主逻辑
+    """
     urlOpener = auth_login()
     send_msg_code(urlOpener)
     while True:
@@ -137,4 +143,5 @@ def main():
         fuck(urlOpener, ids, patientId, msg_code)
         send_msg_code(urlOpener)
 
-main()
+if __name__ == "__main__":
+    main()
