@@ -1,9 +1,17 @@
-
 ## 北京挂号网站协议分析
 
 ### 登陆
 
-__请求__
+#### 登陆请求
+
+|参数名|含义|举个栗子|
+|------|----|--|
+|mobileNo|手机号|181\*\*\*\*\*\*\*\*|
+|password|密码|123456|
+|yzm|是个谜，不影响|空|
+|isAjax|是个谜，不影响|true|
+
+抓包
 ```
 POST /quicklogin.htm HTTP/1.1
 Host: www.bjguahao.gov.cn
@@ -22,8 +30,16 @@ Cookie: SESSION_COOKIE=3cab1829cea36adbceb47f7e; Hm_lvt_bc7eaca5ef5a22b54dd6ca44
 mobileNo=185********&password=********&yzm=&isAjax=true
 ```
 
-__回应(登陆成功)__
 
+#### 登陆回应
+|参数名|含义|举个栗子|
+|------|----|--|
+|data||一般为空|
+|hasError|是否有错误|false|
+|code||200|
+|msg|是否登陆成功(重要)|OK|
+
+抓包(登陆成功)
 ```
 HTTP/1.1 200 OK
 Set-Cookie: JSESSIONID=8154A5F2CFA1A140155CCAD2A13480B2; Path=/; HttpOnly
@@ -38,13 +54,36 @@ Server: Tengine/2.1.2
 {"data":[],"hasError":false,"code":200,"msg":"OK"}
 ```
 
-__回应(登陆失败)__
+抓包(登陆失败)
 ```
 
 ```
 
 ### 查询
+|参数名|含义|举个栗子|
+|------|----|--|
+|hospitalId|医院ID|270|
+|departmentId|科室ID|200003874|
+|dutyCode|上午下午|1表示上午，2表示下午|
+|dutyDate|挂号日期|2017-03-13|
+|isAjax|是个谜|true就好|
+```
+POST /dpt/partduty.htm HTTP/1.1
+Host: www.bjguahao.gov.cn
+Connection: keep-alive
+Content-Length: 80
+Accept: application/json, text/javascript, */*; q=0.01
+Origin: http://www.bjguahao.gov.cn
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+Referer: http://www.bjguahao.gov.cn/dpt/appoint/270-200003874.htm
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.8
+Cookie: SESSION_COOKIE=3cab1829cea36adbceb47f7e; Hm_lvt_bc7eaca5ef5a22b54dd6ca44a23988fa=1488332034,1488961795,1488964531,1489046102; Hm_lpvt_bc7eaca5ef5a22b54dd6ca44a23988fa=1489051826; JSESSIONID=6DFFC0825127030360E31B2C0E11E031
 
+hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
+```
 ### 挂号
 
 ### 关于验证码
