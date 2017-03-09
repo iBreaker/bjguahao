@@ -32,6 +32,7 @@ def auth_login():
     urlOpener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
     AuthUrl = "http://www.bjguahao.gov.cn/quicklogin.htm"
     data = "mobileNo=" + mobileNo + "&password=" + password + "&yzm=" + "&isAjax=true"
+    print data
     request = urllib2.Request(AuthUrl, data)
     request = add_header(request)
     ret = urlOpener.open(request).read()
@@ -121,10 +122,36 @@ def fuck(urlOpener, ids, patientId, msg_code):
     else:
         print msg['msg']
 
+def config():
+    """
+    读取配置文件
+    """
+    global mobileNo
+    global password
+    global date
+    global hospitalId
+    global departmentId
+
+    try:
+        with open('config.json') as json_file:
+            data = json.load(json_file)
+            mobileNo = data["username"]
+            print mobileNo
+            password = data["password"]
+            date = data["date"]
+            hospitalId = data["hospitalId"]
+            departmentId = data["departmentId"]
+
+    except  :
+        print "读取配置错误"
+        exit(0)
+
+
 def main():
     """
     主函数 负责主逻辑
     """
+    config()
     urlOpener = auth_login()
     send_msg_code(urlOpener)
     while True:
@@ -133,7 +160,7 @@ def main():
             if ids == -2:
                 exit("今天没有号了")
             elif ids == -1:
-                print "号还放出, 等待..."
+                print "号还没有放出, 等待..."
                 time.sleep(5)         #号还没有产生，sleep 5秒
                 continue
             else:
