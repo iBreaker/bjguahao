@@ -32,7 +32,6 @@ def auth_login():
     urlOpener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
     AuthUrl = "http://www.bjguahao.gov.cn/quicklogin.htm"
     data = "mobileNo=" + mobileNo + "&password=" + password + "&yzm=" + "&isAjax=true"
-    print data
     request = urllib2.Request(AuthUrl, data)
     request = add_header(request)
     ret = urlOpener.open(request).read()
@@ -136,7 +135,6 @@ def config():
         with open('config.json') as json_file:
             data = json.load(json_file)
             mobileNo = data["username"]
-            print mobileNo
             password = data["password"]
             date = data["date"]
             hospitalId = data["hospitalId"]
