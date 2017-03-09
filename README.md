@@ -11,7 +11,7 @@
 
 ### 配置文件
 
-在脚本目录新建文件 config.json
+在脚本目录将`_config.josn`重命名为`config.json`, 然后写入如下数据
 
 ```json
 {
