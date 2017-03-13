@@ -1,5 +1,8 @@
-#!/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8
+"""
+北京市预约挂号统一平台
+"""
 
 import re
 import json
@@ -93,7 +96,7 @@ def get_patientId(urlOpener, ids):
         return m.group(1)
 
 """
-@dutySourceId   病号id        
+@dutySourceId   病号id
 @hospitalId     医院id  默认: 北医三院
 @departmentId   科室id  默认: 运动医学(特需)
 @doctorId       医生id
@@ -118,7 +121,35 @@ def fuck(urlOpener, ids, patientId, msg_code):
     else:
         print msg['msg']
 
+def config():
+    """
+    读取配置文件
+    """
+    global mobileNo
+    global password
+    global date
+    global hospitalId
+    global departmentId
+
+    try:
+        with open('config.json') as json_file:
+            data = json.load(json_file)
+            mobileNo = data["username"]
+            password = data["password"]
+            date = data["date"]
+            hospitalId = data["hospitalId"]
+            departmentId = data["departmentId"]
+
+    except  :
+        print "读取配置错误"
+        exit(0)
+
+
 def main():
+    """
+    主函数 负责主逻辑
+    """
+    config()
     urlOpener = auth_login()
     send_msg_code(urlOpener)
     while True:
@@ -127,7 +158,7 @@ def main():
             if ids == -2:
                 exit("今天没有号了")
             elif ids == -1:
-                print "号还放出, 等待..."
+                print "号还没有放出, 等待..."
                 time.sleep(5)         #号还没有产生，sleep 5秒
                 continue
             else:
@@ -137,4 +168,5 @@ def main():
         fuck(urlOpener, ids, patientId, msg_code)
         send_msg_code(urlOpener)
 
-main()
+if __name__ == "__main__":
+    main()
