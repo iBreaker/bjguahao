@@ -151,7 +151,6 @@ def main():
     """
     config()
     urlOpener = auth_login()
-    send_msg_code(urlOpener)
     while True:
         while True:
             ids = get_ids(urlOpener)
@@ -164,9 +163,8 @@ def main():
             else:
                 break
         patientId = get_patientId(urlOpener, ids)
+        send_msg_code(urlOpener)
         msg_code = raw_input("输入短信验证码: ")
         fuck(urlOpener, ids, patientId, msg_code)
-        send_msg_code(urlOpener)
-
 if __name__ == "__main__":
     main()
