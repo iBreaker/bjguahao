@@ -63,7 +63,7 @@ def send_msg_code(urlOpener):
 def get_ids(urlOpener):
     url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
 
-    if dutyCode != 1 and dutyCode != 2:
+    if dutyCode != "1" or dutyCode != "2":
         print "dutyCode 参数错误"
         exit(0)
     data = "hospitalId=" + str(hospitalId) +                \
