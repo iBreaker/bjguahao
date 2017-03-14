@@ -5,7 +5,7 @@
 """
 
 # import re
-# import json
+import json
 import time
 # import cookielib
 # import urllib2
@@ -22,11 +22,24 @@ class Config(object):
         self.department_id = ""
         self.duty_code = ""
 
+
+        self.conf_path = ""
+
     def load_conf(self):
         """
         加载配置
         """
-        pass
+        try:
+            with open('config.json') as json_file:
+                data = json.load(json_file)
+                self.mobile_no = data["username"]
+                self.password = data["password"]
+                self.date = data["date"]
+                self.hospital_id = data["hospitalId"]
+                self.department_id = data["departmentId"]
+                self.duty_code = data["dutyCode"]
+    	except  Exception, e:
+            Log.exit(repr(e))
 
     def demo2(self):
         """
@@ -123,11 +136,14 @@ class Log(object):
         打印信息，并退出
         """
         Log.error(msg)
+        Log.error("exit")
         exit(0)
 
 
 if __name__ == "__main__":
     guahao = Guahao()
+    config = Config()
+    config.load_conf()
     if guahao.auth_login() == False:
         pass
 
