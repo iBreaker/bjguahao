@@ -7,8 +7,8 @@
 # import re
 import json
 import time
-# import cookielib
-# import urllib2
+import cookielib
+import urllib2
 
 class Config(object):
     """
@@ -38,6 +38,9 @@ class Config(object):
                 self.hospital_id = data["hospitalId"]
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
+
+                Log.info("配置加载完成")
+
     	except  Exception, e:
             Log.exit(repr(e))
 
@@ -54,7 +57,21 @@ class Browser(object):
     """
 
     def __init__(self):
-        pass
+        self.cookiejar = cookielib.CookieJar()
+        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar))
+        self.opener.addheaders = [
+            ('User-Agent', (
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) '
+                'Chrome/45.0.2454.93 Safari/537.36'
+            )),
+        ]
+
+    def load_cookies(self, path):
+        self.cookiejar.load(path)
+
+    def save_cookies(self, path):
+        self.cookiejar.save(path)
 
     def http_get(self):
         """
@@ -113,14 +130,14 @@ class Log(object):
         """
         info
         """
-        print(u"\033[0;37;40m " + Log.get_time()  + " [info] " + msg  + u"\033[0m")
+        print("\033[0;37;40m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
 
     @staticmethod
     def debug(msg):
         """
         debug
         """
-        print(u"\033[0;34;40m " + Log.get_time()  + " [debug] " + msg  + u"\033[0m")
+        print("\033[0;34;40m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
 
 
     @staticmethod
