@@ -138,7 +138,10 @@ def config():
     global date
     global hospitalId
     global departmentId
+<<<<<<< HEAD
+=======
     global dutyCode
+>>>>>>> refs/remotes/iBreaker/master
 
     try:
         with open('config.json') as json_file:
@@ -148,7 +151,11 @@ def config():
             date = data["date"]
             hospitalId = data["hospitalId"]
             departmentId = data["departmentId"]
+<<<<<<< HEAD
+
+=======
             dutyCode = data["dutyCode"]
+>>>>>>> refs/remotes/iBreaker/master
     except  :
         print "读取配置错误"
         exit(0)
@@ -160,7 +167,6 @@ def main():
     """
     config()
     urlOpener = auth_login()
-    send_msg_code(urlOpener)
     while True:
         while True:
             ids = get_ids(urlOpener)
@@ -173,9 +179,13 @@ def main():
             else:
                 break
         patientId = get_patientId(urlOpener, ids)
+        send_msg_code(urlOpener)
         msg_code = raw_input("输入短信验证码: ")
         fuck(urlOpener, ids, patientId, msg_code)
+<<<<<<< HEAD
+=======
         send_msg_code(urlOpener)
 
+>>>>>>> refs/remotes/iBreaker/master
 if __name__ == "__main__":
     main()
