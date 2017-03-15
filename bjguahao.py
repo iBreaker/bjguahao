@@ -4,11 +4,13 @@
 北京市预约挂号统一平台
 """
 
-# import re
+import os
+import sys
 import json
 import time
-import cookielib
-import urllib2
+import pickle
+import requests
+import requests.utils
 
 class Config(object):
     """
@@ -32,6 +34,7 @@ class Config(object):
         try:
             with open('config.json') as json_file:
                 data = json.load(json_file)
+                data = data[0]
                 self.mobile_no = data["username"]
                 self.password = data["password"]
                 self.date = data["date"]
@@ -40,6 +43,11 @@ class Config(object):
                 self.duty_code = data["dutyCode"]
 
                 Log.info("配置加载完成")
+                Log.debug("手机号:" + str(self.mobile_no ))
+                Log.debug("挂号日期:" + str(self.date))
+                Log.debug("医院id:" + str(self.hospital_id))
+                Log.debug("科室id:" + str(self.department_id))
+                Log.debug("上午/下午:" + str(self.duty_code))
 
     	except  Exception, e:
             Log.exit(repr(e))
@@ -57,33 +65,41 @@ class Browser(object):
     """
 
     def __init__(self):
-        self.cookiejar = cookielib.CookieJar()
-        self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookiejar))
-        self.opener.addheaders = [
-            ('User-Agent', (
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) '
-                'AppleWebKit/537.36 (KHTML, like Gecko) '
-                'Chrome/45.0.2454.93 Safari/537.36'
-            )),
-        ]
+        self.session = requests.Session()
+        self.session.headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        }
+        self.root_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+
 
     def load_cookies(self, path):
-        self.cookiejar.load(path)
+        with open(path, 'rb') as f:
+            self.session.cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
 
     def save_cookies(self, path):
-        self.cookiejar.save(path)
+        with open(path, 'wb') as f:
+            cookies_dic = requests.utils.dict_from_cookiejar(self.session.cookies)
+            pickle.dump(cookies_dic, f)
 
-    def http_get(self):
+    def http_get(self, url, data):
         """
         http get
         """
         pass
+        response = self.session.get(url)
+        if response.status_code == 200:
+			self.session.headers['Referer'] = response.url
+        return response
 
-    def http_post(self):
+    def http_post(self, url, data):
         """
         http post
         """
-        pass
+        response = self.session.post(url, data=data)
+        if response.status_code == 200:
+            self.session.headers['Referer'] = response.url
+        return response
 
 class Guahao(object):
     """

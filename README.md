@@ -19,14 +19,16 @@
 在脚本目录将 `_config.josn` 重命名为 `config.json`, 然后写入如下数据：
 
 ```json
-{
-    "username":"185xxxxxxx",
-    "password":"*******",
-    "date":"2017-02-17",            # 挂号日期
-    "hospitalId":"142",             # 142 北医三院
-    "departmentId":"200039584"      # 运动医学科
-    "dutyCode":"1"                  # 1:上午  2:下午
-}
+[
+    {
+        "username":"185xxxxxxx",
+        "password":"*******",
+        "date":"2017-02-17",            # 挂号日期
+        "hospitalId":"142",             # 142 北医三院
+        "departmentId":"200039584",     # 运动医学科
+        "dutyCode":"1"                  # 1:上午  2:下午
+    }
+]
 ```
 
 ## 文档
