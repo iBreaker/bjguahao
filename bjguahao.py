@@ -16,6 +16,7 @@ date = "2017-02-17"       #挂号日期
 
 hospitalId = 142          #北医三院
 departmentId = 200039584  #运动医学
+dutyCode = 1  #上午/下午/全天
 
 
 def add_header(request):
@@ -54,15 +55,20 @@ def send_msg_code(urlOpener):
         else:
             print msg
             time.sleep(10)
+
 """
 -1 号没有放出，或者今天没号
 -2 号被预约完了
 """
 def get_ids(urlOpener):
     url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
+
+    if dutyCode != "1" or dutyCode != "2":
+        print "dutyCode 参数错误"
+        exit(0)
     data = "hospitalId=" + str(hospitalId) +                \
            "&departmentId=" + str(departmentId) +           \
-           "&dutyCode=1&dutyDate=" + date + "&isAjax=true"
+           "&dutyCode=" + dutyCode  + "&dutyDate=" + date + "&isAjax=true"
     request = urllib2.Request(url, data)
     request = add_header(request)
     ret = urlOpener.open(request).read()
@@ -72,11 +78,13 @@ def get_ids(urlOpener):
 
     # 越往后水平越高
     for doctor in msg['data'][::-1]:
+        print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
+
+    for doctor in msg['data'][::-1]:
         if doctor['remainAvailableNumber']:
+            print "选中:"
             print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
             return { "dutySourceId": doctor['dutySourceId'], "doctorId": doctor['doctorId']}
-    for doctor in msg['data'][::-1]:
-        print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
     return -2
 
 def gen_url(ids):
@@ -130,6 +138,10 @@ def config():
     global date
     global hospitalId
     global departmentId
+<<<<<<< HEAD
+=======
+    global dutyCode
+>>>>>>> refs/remotes/iBreaker/master
 
     try:
         with open('config.json') as json_file:
@@ -139,7 +151,11 @@ def config():
             date = data["date"]
             hospitalId = data["hospitalId"]
             departmentId = data["departmentId"]
+<<<<<<< HEAD
 
+=======
+            dutyCode = data["dutyCode"]
+>>>>>>> refs/remotes/iBreaker/master
     except  :
         print "读取配置错误"
         exit(0)
@@ -166,5 +182,10 @@ def main():
         send_msg_code(urlOpener)
         msg_code = raw_input("输入短信验证码: ")
         fuck(urlOpener, ids, patientId, msg_code)
+<<<<<<< HEAD
+=======
+        send_msg_code(urlOpener)
+
+>>>>>>> refs/remotes/iBreaker/master
 if __name__ == "__main__":
     main()
