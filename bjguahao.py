@@ -82,7 +82,7 @@ class Browser(object):
             cookies_dic = requests.utils.dict_from_cookiejar(self.session.cookies)
             pickle.dump(cookies_dic, f)
 
-    def http_get(self, url, data):
+    def get(self, url, data):
         """
         http get
         """
@@ -92,10 +92,11 @@ class Browser(object):
 			self.session.headers['Referer'] = response.url
         return response
 
-    def http_post(self, url, data):
+    def post(self, url, data):
         """
         http post
         """
+        Log.debug("post data :" +  str(data))
         response = self.session.post(url, data=data)
         if response.status_code == 200:
             self.session.headers['Referer'] = response.url
@@ -106,14 +107,41 @@ class Guahao(object):
     挂号
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, config):
+        self.browser = Browser()
+        self.config = config
+
+        self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
+        self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
+        self.get_doctor_url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
+        self.confirm_url = "http://www.bjguahao.gov.cn/order/confirm.htm"
+
 
     def auth_login(self):
         """
         登陆
         """
-        pass
+        password = self.config.password
+        mobile_no = self.config.mobile_no
+        preload = {
+			'mobileNo': mobile_no,
+			'password': password,
+            'yzm':'',
+			'isAjax': True,
+		}
+        response = self.browser.post(self.login_url, data=preload)
+        Log.debug("response data:" +  response.text)
+        try:
+            data = json.loads(response.text)
+            if data["msg"] == "OK" and data["hasError"] == False:
+                cookies_file = os.path.join(self.browser.root_path, self.config.mobile_no + ".cookies")
+                self.browser.save_cookies(cookies_file)
+                Log.info("登陆成功")
+                return True
+
+        except Exception, e:
+            Log.error("登陆失败")
+            Log.exit(repr(e))
 
     def get_code(self):
         """
@@ -174,9 +202,9 @@ class Log(object):
 
 
 if __name__ == "__main__":
-    guahao = Guahao()
     config = Config()
     config.load_conf()
+    guahao = Guahao(config)
     if guahao.auth_login() == False:
         pass
 
