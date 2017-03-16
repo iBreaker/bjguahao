@@ -110,6 +110,7 @@ class Guahao(object):
     def __init__(self, config):
         self.browser = Browser()
         self.config = config
+        self.dutys = ""
 
         self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
         self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
@@ -138,6 +139,9 @@ class Guahao(object):
                 self.browser.save_cookies(cookies_file)
                 Log.info("登陆成功")
                 return True
+            else:
+                Log.error(data["msg"])
+                raise Exception()
 
         except Exception, e:
             Log.error("登陆失败")
@@ -170,17 +174,49 @@ class Guahao(object):
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
-                for doctor in data["data"]:
-                    print doctor["doctorName"]
-                return True
+                self.dutys = data["data"]
 
         except Exception, e:
             Log.exit(repr(e))
 
-    def get_it(self):
+        for doctor in self.dutys[::-1]:
+            print "医生名字:", doctor['doctorName'], "\t\t擅长:", doctor['skill'], "\t\t号余量:", doctor['remainAvailableNumber']
+
+        for doctor in self.dutys[::-1]:
+            if doctor['remainAvailableNumber']:
+                print "选中:"
+                print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
+                return doctor
+
+    def get_it(self, doctor ):
         """
         挂号
         """
+        duty_source_id = str(doctor['dutySourceId'])
+        hospital_id = self.config.hospital_id
+        department_id = self.config.department_id
+        duty_code = self.config.duty_code
+        duty_date = self.config.date
+        doctor_id = str(doctor['doctorId'])
+
+        preload = {
+            'dutySourceId':duty_source_id,
+            'hospitalId':hospital_id ,
+            'departmentId': department_id,
+            'dutyCode': duty_code,
+            'dutyDate': duty_date,
+            'doctorId': doctor_id,
+            'patientId': "",
+            'hospitalCardId': "",
+            'medicareCardId': "",
+            'smsVerifyCode': "",
+            'childrenBirthday':"",
+			'isAjax': True
+        }
+        response = self.browser.post(self.confirm_url , data=preload)
+        #Log.debug("response data:" +  response.text)
+
+
         pass
 class Log(object):
     """
@@ -230,6 +266,7 @@ if __name__ == "__main__":
     config.load_conf()
     guahao = Guahao(config)
     guahao.auth_login()
-    guahao.select_doctor()
+    doctor = guahao.select_doctor()
+    guahao.get_it(doctor)
 
 
