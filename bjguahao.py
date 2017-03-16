@@ -133,7 +133,7 @@ class Guahao(object):
         Log.debug("response data:" +  response.text)
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and data["hasError"] == False:
+            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
                 cookies_file = os.path.join(self.browser.root_path, self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
                 Log.info("登陆成功")
@@ -151,7 +151,31 @@ class Guahao(object):
 
     def select_doctor(self):
         """选择合适的大夫"""
-        pass
+
+        hospital_id = self.config.hospital_id
+        department_id = self.config.department_id
+        duty_code = self.config.duty_code
+        duty_date = self.config.date
+
+        preload = {
+            'hospitalId':hospital_id ,
+            'departmentId': department_id,
+            'dutyCode': duty_code,
+            'dutyDate': duty_date,
+			'isAjax': True
+        }
+        response = self.browser.post(self.get_doctor_url , data=preload)
+        Log.debug("response data:" +  response.text)
+
+        try:
+            data = json.loads(response.text)
+            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
+                for doctor in data["data"]:
+                    print doctor["doctorName"]
+                return True
+
+        except Exception, e:
+            Log.exit(repr(e))
 
     def get_it(self):
         """
@@ -205,6 +229,7 @@ if __name__ == "__main__":
     config = Config()
     config.load_conf()
     guahao = Guahao(config)
-    if guahao.auth_login() == False:
-        pass
+    guahao.auth_login()
+    guahao.select_doctor()
+
 
