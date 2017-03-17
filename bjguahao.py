@@ -5,6 +5,7 @@
 """
 
 import os
+import re
 import sys
 import json
 import time
@@ -179,6 +180,9 @@ class Guahao(object):
         except Exception, e:
             Log.exit(repr(e))
 
+        if len(self.dutys) == 0:
+            return "NotReady"
+
         for doctor in self.dutys[::-1]:
             print "医生名字:", doctor['doctorName'], "\t\t擅长:", doctor['skill'], "\t\t号余量:", doctor['remainAvailableNumber']
 
@@ -187,6 +191,8 @@ class Guahao(object):
                 print "选中:"
                 print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
                 return doctor
+
+        return "NoDuty"
 
     def get_it(self, doctor ):
         """
@@ -203,21 +209,37 @@ class Guahao(object):
             'dutySourceId':duty_source_id,
             'hospitalId':hospital_id ,
             'departmentId': department_id,
-            'dutyCode': duty_code,
-            'dutyDate': duty_date,
             'doctorId': doctor_id,
-            'patientId': "",
+            'patientId': "222444072",
             'hospitalCardId': "",
             'medicareCardId': "",
-            'smsVerifyCode': "",
+            "reimbursementType":"10",       # 报销类型
+            'smsVerifyCode': "1111",
             'childrenBirthday':"",
 			'isAjax': True
         }
         response = self.browser.post(self.confirm_url , data=preload)
-        #Log.debug("response data:" +  response.text)
+        Log.debug("response data:" +  response.text)
 
 
         pass
+
+    def gen_url(self, doctor):
+
+        return "http://www.bjguahao.gov.cn/order/confirm/" + str(self.config.hospital_id) + \
+           "-" + str(self.config.department_id) + "-" + str(doctor['doctorId']) + "-" +   \
+            str(doctor['dutySourceId']) + ".htm"
+
+    def get_patient_id(self, doctor):
+        addr = self.gen_url(doctor)
+        response = self.browser.get(addr, "")
+        ret = response.text
+        m = re.search('.*<input type=\\"radio\\" name=\\"hzr\\" value=\\"(.*?)\\".*', ret)
+        if m == None:
+            exit("获取患者id失败")
+        else:
+            return m.group(1)
+        
 class Log(object):
     """
     日志
@@ -267,6 +289,13 @@ if __name__ == "__main__":
     guahao = Guahao(config)
     guahao.auth_login()
     doctor = guahao.select_doctor()
-    guahao.get_it(doctor)
+    if doctor == "NoDuty":
+        Log.error("没号了,  亲~")
+    elif doctor == "NotReady":
+        Log.info("好像还没放号？重试中")    # TODO 循环
+    else:
+        guahao.get_it(doctor)
+
+    guahao.get_patient_id(doctor)
 
 
