@@ -201,8 +201,6 @@ class Guahao(object):
         duty_source_id = str(doctor['dutySourceId'])
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
-        duty_code = self.config.duty_code
-        duty_date = self.config.date
         doctor_id = str(doctor['doctorId'])
 
         preload = {
@@ -214,7 +212,7 @@ class Guahao(object):
             'hospitalCardId': "",
             'medicareCardId': "",
             "reimbursementType":"10",       # 报销类型
-            'smsVerifyCode': "1111",
+            'smsVerifyCode': "1111",        # TODO 获取验证码
             'childrenBirthday':"",
 			'isAjax': True
         }
@@ -239,7 +237,7 @@ class Guahao(object):
             exit("获取患者id失败")
         else:
             return m.group(1)
-        
+
 class Log(object):
     """
     日志
@@ -296,6 +294,6 @@ if __name__ == "__main__":
     else:
         guahao.get_it(doctor)
 
-    guahao.get_patient_id(doctor)
+    print guahao.get_patient_id(doctor)
 
 
