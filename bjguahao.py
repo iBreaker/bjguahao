@@ -7,6 +7,7 @@
 import os
 import re
 import json
+import time
 
 from log import Log
 from browser import Browser
@@ -51,13 +52,6 @@ class Config(object):
     	except  Exception, e:
             Log.exit(repr(e))
 
-    def demo2(self):
-        """
-        demo2
-        """
-        pass
-
-
 class Guahao(object):
     """
     挂号
@@ -77,6 +71,7 @@ class Guahao(object):
         """
         登陆
         """
+        Log.info("开始登陆")
         password = self.config.password
         mobile_no = self.config.mobile_no
         preload = {
@@ -148,7 +143,7 @@ class Guahao(object):
 
         return "NoDuty"
 
-    def get_it(self, doctor ):
+    def get_it(self, doctor, sms_code):
         """
         挂号
         """
@@ -166,15 +161,14 @@ class Guahao(object):
             'hospitalCardId': "",
             'medicareCardId': "",
             "reimbursementType":"10",       # 报销类型
-            'smsVerifyCode': "1111",        # TODO 获取验证码
+            'smsVerifyCode': sms_code,        # TODO 获取验证码
             'childrenBirthday':"",
 			'isAjax': True
         }
         response = self.browser.post(self.confirm_url , data=preload)
         Log.debug("response data:" +  response.text)
-
-
-        pass
+        result = True
+        return result
 
     def gen_url(self, doctor):
 
@@ -194,11 +188,11 @@ class Guahao(object):
 
     def get_duty_time(self):
         """获取放号时间"""
-        pass
+        return "9:30"
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
-        pass
+        return 1111
 
     def run(self):
         """主逻辑"""
@@ -207,15 +201,20 @@ class Guahao(object):
         config.load_conf()                      # 加载配置
         self.config = config
         self.auth_login()                       # 1. 登陆
-        doctor =self.select_doctor()            # 2. 选择医生
-        Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
-        if doctor == "NoDuty":
-            Log.error("没号了,  亲~")
-        elif doctor == "NotReady":
-            Log.info("好像还没放号？重试中")    # TODO 循环
-        else:
-            self.get_it(doctor)                 # 4.挂号
-
+        while True:
+            # TODO 获取放号时间，放号前一分钟获取验证码, 放号时间前30秒开始循环
+            sms_code = self.get_sms_verify_code()               # 获取验证码
+            doctor =self.select_doctor()            # 2. 选择医生
+            Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
+            if doctor == "NoDuty":
+                Log.error("没号了,  亲~")
+                break
+            elif doctor == "NotReady":
+                Log.info("好像还没放号？重试中")
+            else:
+                result = self.get_it(doctor, sms_code)                 # 4.挂号
+                if result == True:
+                    break                                    # 挂号成功
 
 if __name__ == "__main__":
     guahao = Guahao()
