@@ -26,7 +26,9 @@
         "date":"2017-02-17",            # 挂号日期
         "hospitalId":"142",             # 142 北医三院
         "departmentId":"200039584",     # 运动医学科
-        "dutyCode":"1"                  # 1:上午  2:下午
+        "dutyCode":"1",                  # 1:上午  2:下午
+
+        "DebugLevel":"info"             # debug / info / error
     }
 ]
 ```
@@ -34,6 +36,10 @@
 ## 文档
 
 [文档](doc.md) 中有比较详细的接口分析和装包。
+
+## 调试
+
+开发者请将`config.json`配置文件中的`DebugLevel`参数设置为`debug`
 
 ## 协议
 
