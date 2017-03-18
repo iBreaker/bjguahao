@@ -11,6 +11,7 @@ import time
 
 from log import Log
 from browser import Browser
+from lib.prettytable import PrettyTable
 
 class Config(object):
     """
@@ -132,16 +133,25 @@ class Guahao(object):
         if len(self.dutys) == 0:
             return "NotReady"
 
-        for doctor in self.dutys[::-1]:
-            print "医生名字:", doctor['doctorName'], "\t\t擅长:", doctor['skill'], "\t\t号余量:", doctor['remainAvailableNumber']
+        self.print_doctor()
 
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
                 print "选中:"
                 print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
                 return doctor
-
         return "NoDuty"
+
+    def print_doctor(self):
+
+        Log.info("当前号余量:")
+        x = PrettyTable()
+        x.border = True
+        x.field_names = ["医生姓名", "擅长", "号余量"]
+        for doctor in self.dutys:
+            x.add_row([doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber']])
+        print x.get_string()
+        pass
 
     def get_it(self, doctor, sms_code):
         """
