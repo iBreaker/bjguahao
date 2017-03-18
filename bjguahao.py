@@ -23,14 +23,13 @@ class Config(object):
         self.hospital_id = ""
         self.department_id = ""
         self.duty_code = ""
-
-
         self.conf_path = ""
 
     def load_conf(self):
         """
         加载配置
         """
+
         try:
             with open('config.json') as json_file:
                 data = json.load(json_file)
@@ -65,6 +64,7 @@ class Guahao(object):
         self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
         self.get_doctor_url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
         self.confirm_url = "http://www.bjguahao.gov.cn/order/confirm.htm"
+        self.patient_id_url = "http://www.bjguahao.gov.cn/order/confirm/"
 
 
     def auth_login(self):
@@ -185,7 +185,7 @@ class Guahao(object):
 
     def gen_url(self, doctor):
 
-        return "http://www.bjguahao.gov.cn/order/confirm/" + str(self.config.hospital_id) + \
+        return self.patient_id_url + str(self.config.hospital_id) + \
            "-" + str(self.config.department_id) + "-" + str(doctor['doctorId']) + "-" +   \
             str(doctor['dutySourceId']) + ".htm"
 
@@ -231,5 +231,6 @@ class Guahao(object):
                     break                                    # 挂号成功
 
 if __name__ == "__main__":
+    Log.load_debug_level()
     guahao = Guahao()
     guahao.run()
