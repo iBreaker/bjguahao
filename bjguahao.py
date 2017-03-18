@@ -6,12 +6,10 @@
 
 import os
 import re
-import sys
 import json
-import time
-import pickle
-import requests
-import requests.utils
+
+from log import Log
+from browser import Browser
 
 class Config(object):
     """
@@ -59,49 +57,6 @@ class Config(object):
         """
         pass
 
-
-class Browser(object):
-    """
-    浏览器
-    """
-
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        }
-        self.root_path = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-
-    def load_cookies(self, path):
-        with open(path, 'rb') as f:
-            self.session.cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
-
-    def save_cookies(self, path):
-        with open(path, 'wb') as f:
-            cookies_dic = requests.utils.dict_from_cookiejar(self.session.cookies)
-            pickle.dump(cookies_dic, f)
-
-    def get(self, url, data):
-        """
-        http get
-        """
-        pass
-        response = self.session.get(url)
-        if response.status_code == 200:
-			self.session.headers['Referer'] = response.url
-        return response
-
-    def post(self, url, data):
-        """
-        http post
-        """
-        Log.debug("post data :" +  str(data))
-        response = self.session.post(url, data=data)
-        if response.status_code == 200:
-            self.session.headers['Referer'] = response.url
-        return response
 
 class Guahao(object):
     """
@@ -260,51 +215,6 @@ class Guahao(object):
             Log.info("好像还没放号？重试中")    # TODO 循环
         else:
             self.get_it(doctor)                 # 4.挂号
-
-
-
-
-class Log(object):
-    """
-    日志
-    """
-    @staticmethod
-    def get_time():
-        """
-        获取时间
-        """
-        return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-
-    @staticmethod
-    def info(msg):
-        """
-        info
-        """
-        print("\033[0;37;40m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
-
-    @staticmethod
-    def debug(msg):
-        """
-        debug
-        """
-        print("\033[0;34;40m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
-
-
-    @staticmethod
-    def error(msg):
-        """
-        输出错误
-        """
-        print("\033[0;31;40m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
-
-    @staticmethod
-    def exit(msg):
-        """
-        打印信息，并退出
-        """
-        Log.error(msg)
-        Log.error("exit")
-        exit(0)
 
 
 if __name__ == "__main__":
