@@ -10,6 +10,9 @@ import requests.utils
 
 from log import  Log
 
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
+
 class Browser(object):
     """
     浏览器

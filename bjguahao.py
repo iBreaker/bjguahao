@@ -5,6 +5,7 @@
 """
 
 import os
+import sys
 import re
 import json
 import time
@@ -12,6 +13,9 @@ import time
 from log import Log
 from browser import Browser
 from lib.prettytable import PrettyTable
+
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 
 class Config(object):
     """
@@ -137,8 +141,7 @@ class Guahao(object):
 
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
-                print "选中:"
-                print "医生名字:\t", doctor['doctorName'], "擅长:\t", doctor['skill'], "号余量:\t", doctor['remainAvailableNumber']
+                Log.info(u"选中:" + str(doctor["doctorName"]))
                 return doctor
         return "NoDuty"
 
@@ -225,6 +228,9 @@ class Guahao(object):
         self.config = config
         self.auth_login()                       # 1. 登陆
         while True:
+            print ""
+            print ""
+            print ""
             # TODO 获取放号时间，放号前一分钟获取验证码, 放号时间前30秒开始循环
             sms_code = self.get_sms_verify_code()               # 获取验证码
             doctor =self.select_doctor()            # 2. 选择医生

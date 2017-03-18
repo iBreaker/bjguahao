@@ -3,6 +3,11 @@
 
 import time
 import json
+import sys
+
+
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 
 class Debug_level():
     debug = 1
