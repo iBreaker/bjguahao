@@ -238,6 +238,16 @@ class Guahao(object):
         else:
             return m.group(1)
 
+    def get_duty_time(self):
+        """获取放号时间"""
+        pass
+
+    def get_sms_verify_code(self):
+        """获取短信验证码"""
+        pass
+
+
+
 class Log(object):
     """
     日志
