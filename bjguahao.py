@@ -167,8 +167,21 @@ class Guahao(object):
         }
         response = self.browser.post(self.confirm_url , data=preload)
         Log.debug("response data:" +  response.text)
-        result = True
-        return result
+
+        try:
+            data = json.loads(response.text)
+            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
+                Log.info("挂号成功")
+                return True
+            else:
+                Log.error(data["msg"])
+                return False
+
+        except Exception, e:
+            Log.error(repr(e))
+            time.sleep(1)
+
+
 
     def gen_url(self, doctor):
 
@@ -211,6 +224,7 @@ class Guahao(object):
                 break
             elif doctor == "NotReady":
                 Log.info("好像还没放号？重试中")
+                time.sleep(1)
             else:
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
                 if result == True:
