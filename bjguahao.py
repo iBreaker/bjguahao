@@ -108,9 +108,8 @@ class Guahao(object):
     挂号
     """
 
-    def __init__(self, config):
+    def __init__(self):
         self.browser = Browser()
-        self.config = config
         self.dutys = ""
 
         self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
@@ -246,6 +245,23 @@ class Guahao(object):
         """获取短信验证码"""
         pass
 
+    def run(self):
+        """主逻辑"""
+
+        config = Config()                       # config对象
+        config.load_conf()                      # 加载配置
+        self.config = config
+        self.auth_login()                       # 1. 登陆
+        doctor =self.select_doctor()            # 2. 选择医生
+        Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
+        if doctor == "NoDuty":
+            Log.error("没号了,  亲~")
+        elif doctor == "NotReady":
+            Log.info("好像还没放号？重试中")    # TODO 循环
+        else:
+            self.get_it(doctor)                 # 4.挂号
+
+
 
 
 class Log(object):
@@ -292,18 +308,5 @@ class Log(object):
 
 
 if __name__ == "__main__":
-    config = Config()
-    config.load_conf()
-    guahao = Guahao(config)
-    guahao.auth_login()
-    doctor = guahao.select_doctor()
-    if doctor == "NoDuty":
-        Log.error("没号了,  亲~")
-    elif doctor == "NotReady":
-        Log.info("好像还没放号？重试中")    # TODO 循环
-    else:
-        guahao.get_it(doctor)
-
-    print guahao.get_patient_id(doctor)
-
-
+    guahao = Guahao()
+    guahao.run()
