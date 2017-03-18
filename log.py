@@ -20,14 +20,14 @@ class Log(object):
         """
         info
         """
-        print("\033[0;37;40m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
+        print("\033[0;37m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
 
     @staticmethod
     def debug(msg):
         """
         debug
         """
-        print("\033[0;34;40m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
+        print("\033[0;34m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
 
 
     @staticmethod
@@ -35,7 +35,7 @@ class Log(object):
         """
         输出错误
         """
-        print("\033[0;31;40m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
+        print("\033[0;31m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
 
     @staticmethod
     def exit(msg):
