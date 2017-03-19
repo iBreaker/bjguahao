@@ -102,12 +102,6 @@ class Guahao(object):
             Log.error("登陆失败")
             Log.exit(repr(e))
 
-    def get_code(self):
-        """
-        获取验证码
-        """
-        pass
-
     def select_doctor(self):
         """选择合适的大夫"""
 
@@ -218,7 +212,14 @@ class Guahao(object):
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
-        return 1111
+        response = self.browser.post(self.send_code_url, "")
+        data = json.loads(response.text)
+        if data["msg"] == "OK" and data["code"] == 200:
+            Log.info("获取验证码成功")
+            return raw_input("输入短信验证码: ")
+        else:
+            Log.error(data["msg"])
+            return None
 
     def run(self):
         """主逻辑"""
@@ -230,10 +231,11 @@ class Guahao(object):
         while True:
             print ""
             print ""
-            print ""
             # TODO 获取放号时间，放号前一分钟获取验证码, 放号时间前30秒开始循环
             sms_code = self.get_sms_verify_code()               # 获取验证码
-            doctor =self.select_doctor()            # 2. 选择医生
+            if sms_code == None:
+                continue
+            doctor = self.select_doctor()            # 2. 选择医生
             Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
             if doctor == "NoDuty":
                 Log.error("没号了,  亲~")
