@@ -29,6 +29,8 @@ class Config(object):
         self.department_id = ""
         self.duty_code = ""
         self.conf_path = ""
+        self.patient_name = ""
+        self.patient_id = ""
 
     def load_conf(self):
         """
@@ -45,6 +47,7 @@ class Config(object):
                 self.hospital_id = data["hospitalId"]
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
+                self.patient_name = data["patientName"]
 
                 Log.info("配置加载完成")
                 Log.debug("手机号:" + str(self.mobile_no ))
@@ -157,6 +160,7 @@ class Guahao(object):
         duty_source_id = str(doctor['dutySourceId'])
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
+        patient_id = self.config.patient_id
         doctor_id = str(doctor['doctorId'])
 
         preload = {
@@ -164,7 +168,7 @@ class Guahao(object):
             'hospitalId':hospital_id ,
             'departmentId': department_id,
             'doctorId': doctor_id,
-            'patientId': "222444072",
+            'patientId': patient_id,
             'hospitalCardId': "",
             'medicareCardId': "",
             "reimbursementType":"10",       # 报销类型
@@ -197,14 +201,16 @@ class Guahao(object):
             str(doctor['dutySourceId']) + ".htm"
 
     def get_patient_id(self, doctor):
+        """获取就诊人Id"""
         addr = self.gen_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
-        m = re.search('.*<input type=\\"radio\\" name=\\"hzr\\" value=\\"(.*?)\\".*', ret)
+        m = re.search(u'<input type=\\"radio\\" name=\\"hzr\\" value=\\"(?P<patientId>\d+)\\"[^>]*> ' + self.config.patient_name, ret)
         if m == None:
             exit("获取患者id失败")
         else:
-            return m.group(1)
+            self.config.patient_id = m.group('patientId')
+            return self.config.patient_id
 
     def get_duty_time(self):
         """获取放号时间"""
@@ -239,7 +245,6 @@ class Guahao(object):
             if sms_code == None:
                 continue
             doctor = self.select_doctor()            # 2. 选择医生
-            Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
             if doctor == "NoDuty":
                 Log.error("没号了,  亲~")
                 break
@@ -247,6 +252,7 @@ class Guahao(object):
                 Log.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
                 if result == True:
                     break                                    # 挂号成功
