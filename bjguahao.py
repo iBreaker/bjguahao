@@ -55,6 +55,7 @@ class Config(object):
                 Log.debug("医院id:" + str(self.hospital_id))
                 Log.debug("科室id:" + str(self.department_id))
                 Log.debug("上午/下午:" + str(self.duty_code))
+                Log.debug("就诊人姓名:" + str(self.patient_name))
 
     	except  Exception, e:
             Log.exit(repr(e))
@@ -73,6 +74,7 @@ class Guahao(object):
         self.get_doctor_url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
         self.confirm_url = "http://www.bjguahao.gov.cn/order/confirm.htm"
         self.patient_id_url = "http://www.bjguahao.gov.cn/order/confirm/"
+        self.department_url = "http://www.bjguahao.gov.cn/dpt/appoint/"
 
 
     def auth_login(self):
@@ -194,7 +196,7 @@ class Guahao(object):
 
 
 
-    def gen_url(self, doctor):
+    def gen_doctor_url(self, doctor):
 
         return self.patient_id_url + str(self.config.hospital_id) + \
            "-" + str(self.config.department_id) + "-" + str(doctor['doctorId']) + "-" +   \
@@ -202,7 +204,7 @@ class Guahao(object):
 
     def get_patient_id(self, doctor):
         """获取就诊人Id"""
-        addr = self.gen_url(doctor)
+        addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
         m = re.search(u'<input type=\\"radio\\" name=\\"hzr\\" value=\\"(?P<patientId>\d+)\\"[^>]*> ' + self.config.patient_name, ret)
@@ -211,10 +213,25 @@ class Guahao(object):
         else:
             self.config.patient_id = m.group('patientId')
             return self.config.patient_id
+    def gen_department_url(self):
+        return self.department_url + str(self.config.hospital_id) + \
+            "-" + str(self.config.department_id) + ".htm"
 
     def get_duty_time(self):
         """获取放号时间"""
-        return "9:30"
+        addr = self.gen_department_url()
+        response = self.browser.get(addr,"")
+        ret = response.text
+        
+        # 放号时间
+        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新',ret)
+        refresh_time = m.group('refreshTime')
+
+        # 放号日期
+        m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
+        appoint_day = m.group('appointDay')
+
+        return refresh_time
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
@@ -236,6 +253,7 @@ class Guahao(object):
         config = Config()                       # config对象
         config.load_conf()                      # 加载配置
         self.config = config
+        self.get_duty_time()
         self.auth_login()                       # 1. 登陆
         while True:
             print ""
