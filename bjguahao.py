@@ -214,9 +214,12 @@ class Guahao(object):
         """获取短信验证码"""
         response = self.browser.post(self.send_code_url, "")
         data = json.loads(response.text)
-        if data["msg"] == "OK" and data["code"] == 200:
+        Log.debug(response.text)
+        if data["msg"] == "OK." and data["code"] == 200:
             Log.info("获取验证码成功")
             return raw_input("输入短信验证码: ")
+        elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
+            Log.exit(data["msg"])
         else:
             Log.error(data["msg"])
             return None
