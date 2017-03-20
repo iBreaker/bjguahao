@@ -212,7 +212,10 @@ class Guahao(object):
             exit("获取患者id失败")
         else:
             self.config.patient_id = m.group('patientId')
+            Log.info( "病人ID:" + self.config.patient_id)
+            
             return self.config.patient_id
+
     def gen_department_url(self):
         return self.department_url + str(self.config.hospital_id) + \
             "-" + str(self.config.department_id) + ".htm"
@@ -226,10 +229,11 @@ class Guahao(object):
         # 放号时间
         m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新',ret)
         refresh_time = m.group('refreshTime')
-
+        Log.info("更新时间: " + refresh_time)
         # 放号日期
         m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
         appoint_day = m.group('appointDay')
+        Log.info("预约周期: " + appoint_day)
 
         return refresh_time
 
@@ -253,7 +257,7 @@ class Guahao(object):
         config = Config()                       # config对象
         config.load_conf()                      # 加载配置
         self.config = config
-        self.get_duty_time()
+        refresh_time = self.get_duty_time()
         self.auth_login()                       # 1. 登陆
         while True:
             print ""
@@ -270,7 +274,7 @@ class Guahao(object):
                 Log.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
-                Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
+                self.get_patient_id(doctor)         # 3. 获取病人id
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
                 if result == True:
                     break                                    # 挂号成功
