@@ -6,6 +6,7 @@
         "hospitalId":"142",      
         "departmentId":"200039602",
         "dutyCode":"1",
+        "patientName":"",
 
 
         "DebugLevel":"info"
