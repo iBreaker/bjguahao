@@ -239,7 +239,6 @@ class Guahao(object):
             if sms_code == None:
                 continue
             doctor = self.select_doctor()            # 2. 选择医生
-            Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
             if doctor == "NoDuty":
                 Log.error("没号了,  亲~")
                 break
@@ -247,6 +246,7 @@ class Guahao(object):
                 Log.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                Log.info( "病人ID:" + str(self.get_patient_id(doctor)))       # 3. 获取病人id
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
                 if result == True:
                     break                                    # 挂号成功
