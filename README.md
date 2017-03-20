@@ -25,7 +25,7 @@
         "password":"*******",
         "date":"2017-02-17",            # 挂号日期
         "hospitalId":"142",             # 142 北医三院
-        "departmentId":"200039584",     # 运动医学科
+        "departmentId":"200039602",     # 运动医学科
         "dutyCode":"1",                  # 1:上午  2:下午
 
         "DebugLevel":"info"             # debug / info / error
