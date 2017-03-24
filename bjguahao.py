@@ -49,13 +49,13 @@ class Config(object):
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
 
-                Log.info("配置加载完成")
-                Log.debug("手机号:" + str(self.mobile_no ))
-                Log.debug("挂号日期:" + str(self.date))
-                Log.debug("医院id:" + str(self.hospital_id))
-                Log.debug("科室id:" + str(self.department_id))
-                Log.debug("上午/下午:" + str(self.duty_code))
-                Log.debug("就诊人姓名:" + str(self.patient_name))
+                Log.info("配置加载完成".encode("GBK", 'ignore'))
+                Log.debug("手机号:".encode("GBK", 'ignore') + str(self.mobile_no ))
+                Log.debug("挂号日期:".encode("GBK", 'ignore') + str(self.date))
+                Log.debug("医院id:".encode("GBK", 'ignore') + str(self.hospital_id))
+                Log.debug("科室id:".encode("GBK", 'ignore') + str(self.department_id))
+                Log.debug("上午/下午:".encode("GBK", 'ignore') + str(self.duty_code))
+                Log.debug("就诊人姓名:".encode("GBK", 'ignore') + str(self.patient_name))
 
     	except  Exception, e:
             Log.exit(repr(e))
@@ -81,7 +81,7 @@ class Guahao(object):
         """
         登陆
         """
-        Log.info("开始登陆")
+        Log.info("开始登陆".encode("GBK", 'ignore'))
         password = self.config.password
         mobile_no = self.config.mobile_no
         preload = {
@@ -97,14 +97,14 @@ class Guahao(object):
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
                 cookies_file = os.path.join(self.browser.root_path, self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
-                Log.info("登陆成功")
+                Log.info("登陆成功".encode("GBK", 'ignore'))
                 return True
             else:
                 Log.error(data["msg"])
                 raise Exception()
 
         except Exception, e:
-            Log.error("登陆失败")
+            Log.error("登陆失败".encode("GBK", 'ignore'))
             Log.exit(repr(e))
 
     def select_doctor(self):
@@ -140,13 +140,13 @@ class Guahao(object):
 
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
-                Log.info(u"选中:" + str(doctor["doctorName"]))
+                Log.info(u"选中:".encode("GBK", 'ignore') + str(doctor["doctorName"]).encode("GBK", 'ignore'))
                 return doctor
         return "NoDuty"
 
     def print_doctor(self):
 
-        Log.info("当前号余量:")
+        Log.info("当前号余量:".encode("GBK", 'ignore'))
         x = PrettyTable()
         x.border = True
         x.field_names = ["医生姓名", "擅长", "号余量"]
@@ -184,7 +184,7 @@ class Guahao(object):
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
-                Log.info("挂号成功")
+                Log.info("挂号成功".encode("GBK", 'ignore'))
                 return True
             else:
                 Log.error(data["msg"])
@@ -209,7 +209,7 @@ class Guahao(object):
         ret = response.text
         m = re.search(u'<input type=\\"radio\\" name=\\"hzr\\" value=\\"(?P<patientId>\d+)\\"[^>]*> ' + self.config.patient_name, ret)
         if m == None:
-            exit("获取患者id失败")
+            exit("获取患者id失败".encode("GBK", 'ignore'))
         else:
             self.config.patient_id = m.group('patientId')
             Log.info( "病人ID:" + self.config.patient_id)
@@ -243,8 +243,8 @@ class Guahao(object):
         data = json.loads(response.text)
         Log.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
-            Log.info("获取验证码成功")
-            return raw_input("输入短信验证码: ")
+            Log.info("获取验证码成功".encode("GBK", 'ignore'))
+            return raw_input("输入短信验证码: ".encode("GBK", 'ignore'))
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             Log.exit(data["msg"])
         else:
@@ -268,10 +268,10 @@ class Guahao(object):
                 continue
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
-                Log.error("没号了,  亲~")
+                Log.error("没号了,  亲~".encode("GBK", 'ignore'))
                 break
             elif doctor == "NotReady":
-                Log.info("好像还没放号？重试中")
+                Log.info("好像还没放号？重试中".encode("GBK", 'ignore'))
                 time.sleep(1)
             else:
                 self.get_patient_id(doctor)         # 3. 获取病人id
