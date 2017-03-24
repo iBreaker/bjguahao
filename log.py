@@ -54,11 +54,23 @@ class Log(object):
         return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
 
     @staticmethod
+    def set_encoding(msg):
+        """
+        windows console didn't support utf-8
+        """
+        if sys.getfilesystemencoding() == 'mbcs':
+            msg = msg.encode("GBK")
+        if sys.getfilesystemencoding() == 'utf-8':
+            msg = msg.encode("utf-8")
+        return msg
+
+    @staticmethod
     def info(msg):
         """
         info
         """
         global debug_level
+        msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.info:
             print("\033[0;37m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
 
@@ -68,6 +80,7 @@ class Log(object):
         debug
         """
         global debug_level
+        msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.debug:
             print("\033[0;34m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
 
@@ -78,6 +91,7 @@ class Log(object):
         输出错误
         """
         global debug_level
+        msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.error:
             print("\033[0;31m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
 
