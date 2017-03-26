@@ -9,6 +9,8 @@ import sys
 import re
 import json
 import time
+import datetime
+
 
 from log import Log
 from browser import Browser
@@ -68,6 +70,7 @@ class Guahao(object):
     def __init__(self):
         self.browser = Browser()
         self.dutys = ""
+        self.refresh_time = ''
 
         self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
         self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
@@ -223,19 +226,24 @@ class Guahao(object):
     def get_duty_time(self):
         """获取放号时间"""
         addr = self.gen_department_url()
-        response = self.browser.get(addr,"")
+        response = self.browser.get(addr, "")
         ret = response.text
 
         # 放号时间
-        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新',ret)
+        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新', ret)
         refresh_time = m.group('refreshTime')
-        Log.info("更新时间: " + refresh_time)
         # 放号日期
         m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
         appoint_day = m.group('appointDay')
-        Log.info("预约周期: " + appoint_day)
 
-        return refresh_time
+        today = datetime.date.today()
+
+        con_data_str = self.config.date + " " + refresh_time + ":00"
+        self.start_time =  datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') +  datetime.timedelta(days= - int(appoint_day))
+        self.stop_date = today + datetime.timedelta(days=int(appoint_day))
+
+        Log.info("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
+        Log.info("今日可挂号到: " + self.stop_date.strftime("%Y-%m-%d"))
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
@@ -257,14 +265,24 @@ class Guahao(object):
         config = Config()                       # config对象
         config.load_conf()                      # 加载配置
         self.config = config
-        refresh_time = self.get_duty_time()
+        self.get_duty_time()
+
+
         self.auth_login()                       # 1. 登陆
+
+        if self.start_time > datetime.datetime.now():
+            seconds =  (self.start_time -  datetime.datetime.now()).total_seconds()
+            Log.info("距离放号时间还有" + str(seconds) + "秒")
+            sleep_time = seconds - 60
+            Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
+            time.sleep(sleep_time)
+
+        doctor = "";
         while True:
-            print ""
-            print ""
-            # TODO 获取放号时间，放号前一分钟获取验证码, 放号时间前30秒开始循环
-            sms_code = self.get_sms_verify_code()               # 获取验证码
+            if doctor != "NotReady":
+                sms_code = self.get_sms_verify_code()               # 获取验证码
             if sms_code == None:
+                time.sleep(1)
                 continue
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
