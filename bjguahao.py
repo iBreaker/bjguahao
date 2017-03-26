@@ -213,7 +213,7 @@ class Guahao(object):
         else:
             self.config.patient_id = m.group('patientId')
             Log.info( "病人ID:" + self.config.patient_id)
-            
+
             return self.config.patient_id
 
     def gen_department_url(self):
@@ -225,7 +225,7 @@ class Guahao(object):
         addr = self.gen_department_url()
         response = self.browser.get(addr,"")
         ret = response.text
-        
+
         # 放号时间
         m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新',ret)
         refresh_time = m.group('refreshTime')
@@ -280,6 +280,6 @@ class Guahao(object):
                     break                                    # 挂号成功
 
 if __name__ == "__main__":
-    Log.load_debug_level()
+    Log.load_config()
     guahao = Guahao()
     guahao.run()

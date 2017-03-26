@@ -16,6 +16,7 @@ class Debug_level():
 
 
 global debug_level
+global filesystemencoding
 
 class Log(object):
     """
@@ -23,9 +24,13 @@ class Log(object):
     """
 
     @staticmethod
-    def load_debug_level():
+    def load_config():
         """获取log配置"""
         global debug_level
+        global filesystemencoding
+
+        filesystemencoding = sys.getfilesystemencoding()
+
         try:
             with open('config.json') as json_file:
                 data = json.load(json_file)
@@ -58,9 +63,11 @@ class Log(object):
         """
         windows console didn't support utf-8
         """
-        if sys.getfilesystemencoding() == 'mbcs':
+        global filesystemencoding
+
+        if filesystemencoding == 'mbcs':
             msg = msg.encode("GBK")
-        if sys.getfilesystemencoding() == 'utf-8':
+        if filesystemencoding== 'utf-8':
             msg = msg.encode("utf-8")
         return msg
 
