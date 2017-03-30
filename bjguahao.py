@@ -274,16 +274,12 @@ class Guahao(object):
             seconds =  (self.start_time -  datetime.datetime.now()).total_seconds()
             Log.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
-            Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
-            time.sleep(sleep_time)
+            if sleep_time > 0:
+                Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
+                time.sleep(sleep_time)
 
         doctor = "";
         while True:
-            if doctor != "NotReady":
-                sms_code = self.get_sms_verify_code()               # 获取验证码
-            if sms_code == None:
-                time.sleep(1)
-                continue
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
                 Log.error("没号了,  亲~")
@@ -292,6 +288,10 @@ class Guahao(object):
                 Log.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                sms_code = self.get_sms_verify_code()               # 获取验证码
+                if sms_code == None:
+                    time.sleep(1)
+
                 self.get_patient_id(doctor)         # 3. 获取病人id
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
                 if result == True:
