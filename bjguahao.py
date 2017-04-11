@@ -230,7 +230,7 @@ class Guahao(object):
         ret = response.text
 
         # 放号时间
-        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{2}:\d{2})更新', ret)
+        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{1,2}:\d{2})更新', ret)
         refresh_time = m.group('refreshTime')
         # 放号日期
         m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
