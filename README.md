@@ -16,7 +16,7 @@ https://bjguahao.0x7c00.cn/
 
 ## 环境
 
-- Python
+- Python 2.X
 
 ## 配置文件
 
