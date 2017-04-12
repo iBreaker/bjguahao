@@ -34,13 +34,21 @@ class Config(object):
         self.patient_name = ""
         self.patient_id = ""
 
-    def load_conf(self):
+    def load_conf(self, conf):
         """
         加载配置
         """
+        conf_file = 'config.json'
+        if conf:
+            conf_file = 'config_{0}.json'.format(conf)
 
         try:
-            with open('config.json') as json_file:
+            file_exist = os.path.isfile(conf_file)
+            if not file_exist:
+                Log.error("配置文件不存在")
+                raise Exception()
+
+            with open(conf_file) as json_file:
                 data = json.load(json_file)
                 data = data[0]
                 self.mobile_no = data["username"]
@@ -59,7 +67,7 @@ class Config(object):
                 Log.debug("上午/下午:" + str(self.duty_code))
                 Log.debug("就诊人姓名:" + str(self.patient_name))
 
-    	except  Exception, e:
+        except  Exception, e:
             Log.exit(repr(e))
 
 class Guahao(object):
@@ -88,11 +96,11 @@ class Guahao(object):
         password = self.config.password
         mobile_no = self.config.mobile_no
         preload = {
-			'mobileNo': mobile_no,
-			'password': password,
+            'mobileNo': mobile_no,
+            'password': password,
             'yzm':'',
-			'isAjax': True,
-		}
+            'isAjax': True,
+        }
         response = self.browser.post(self.login_url, data=preload)
         Log.debug("response data:" +  response.text)
         try:
@@ -123,7 +131,7 @@ class Guahao(object):
             'departmentId': department_id,
             'dutyCode': duty_code,
             'dutyDate': duty_date,
-			'isAjax': True
+            'isAjax': True
         }
         response = self.browser.post(self.get_doctor_url , data=preload)
         Log.debug("response data:" +  response.text)
@@ -179,7 +187,7 @@ class Guahao(object):
             "reimbursementType":"10",       # 报销类型
             'smsVerifyCode': sms_code,        # TODO 获取验证码
             'childrenBirthday':"",
-			'isAjax': True
+            'isAjax': True
         }
         response = self.browser.post(self.confirm_url , data=preload)
         Log.debug("response data:" +  response.text)
@@ -229,12 +237,17 @@ class Guahao(object):
         response = self.browser.get(addr, "")
         ret = response.text
 
+        # 给一个默认值，防止匹配不到抛出异常
+        refresh_time = "9:30"
+        appoint_day = "7天"
         # 放号时间
         m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{1,2}:\d{2})更新', ret)
-        refresh_time = m.group('refreshTime')
+        if m:
+            refresh_time = m.group('refreshTime')
         # 放号日期
         m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
-        appoint_day = m.group('appointDay')
+        if m:
+            appoint_day = m.group('appointDay')
 
         today = datetime.date.today()
 
@@ -259,14 +272,13 @@ class Guahao(object):
             Log.error(data["msg"])
             return None
 
-    def run(self):
+    def run(self, conf):
         """主逻辑"""
 
         config = Config()                       # config对象
-        config.load_conf()                      # 加载配置
+        config.load_conf(conf)                      # 加载配置
         self.config = config
         self.get_duty_time()
-
 
         self.auth_login()                       # 1. 登陆
 
@@ -278,7 +290,7 @@ class Guahao(object):
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
 
-        doctor = "";
+        doctor = ""
         while True:
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
@@ -300,4 +312,5 @@ class Guahao(object):
 if __name__ == "__main__":
     Log.load_config()
     guahao = Guahao()
-    guahao.run()
+    conf = raw_input("Input Config: ")
+    guahao.run(conf)
