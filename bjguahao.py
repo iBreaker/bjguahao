@@ -34,13 +34,13 @@ class Config(object):
         self.patient_name = ""
         self.patient_id = ""
 
-    def load_conf(self):
+    def load_conf(self, config_path):
         """
         加载配置
         """
 
         try:
-            with open('config.json') as json_file:
+            with open(config_path) as json_file:
                 data = json.load(json_file)
                 data = data[0]
                 self.mobile_no = data["username"]
@@ -269,11 +269,11 @@ class Guahao(object):
             Log.error(data["msg"])
             return None
 
-    def run(self):
+    def run(self, config_path):
         """主逻辑"""
 
         config = Config()                       # config对象
-        config.load_conf()                      # 加载配置
+        config.load_conf(config_path)                      # 加载配置
         self.config = config
         self.get_duty_time()
 
@@ -308,6 +308,13 @@ class Guahao(object):
                     break                                    # 挂号成功
 
 if __name__ == "__main__":
-    Log.load_config()
+    # 生成默认 config 地址
+    config_path = 'config.json'
+
+    # 覆盖 config 地址
+    for i in range(1, len(sys.argv)):
+        if (sys.argv[i] == '-c') & (i+1 < len(sys.argv)):
+            config_path = sys.argv[i+1]
+    Log.load_config(config_path)
     guahao = Guahao()
-    guahao.run()
+    guahao.run(config_path)
