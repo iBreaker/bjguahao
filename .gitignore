@@ -1,3 +1,5 @@
-config.json
+*.json
+!_config.json
+
 *.cookies
 *.pyc
