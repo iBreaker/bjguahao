@@ -66,7 +66,7 @@ class Log(object):
         global filesystemencoding
 
         if filesystemencoding == 'mbcs':
-            msg = msg.encode("GBK")
+            msg = msg.encode("utf-8")
         if filesystemencoding== 'utf-8':
             msg = msg.encode("utf-8")
         return msg
