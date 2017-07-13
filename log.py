@@ -24,7 +24,7 @@ class Log(object):
     """
 
     @staticmethod
-    def load_config():
+    def load_config(config_path):
         """获取log配置"""
         global debug_level
         global filesystemencoding
@@ -32,7 +32,7 @@ class Log(object):
         filesystemencoding = sys.getfilesystemencoding()
 
         try:
-            with open('config.json') as json_file:
+            with open(config_path) as json_file:
                 data = json.load(json_file)
                 data = data[0]
                 if data["DebugLevel"] == "info":
