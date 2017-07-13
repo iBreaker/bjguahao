@@ -18,6 +18,11 @@ https://bjguahao.0x7c00.cn/
 
 - Python
 
+## 运行
+
+- 默认用法： ```python2 bjguahao.py```
+- 指定配置： ```python2 bjguahao.py -c test.json```
+
 ## 配置文件
 
 在脚本目录将 `_config.josn` 重命名为 `config.json`, 然后写入如下数据：
@@ -27,8 +32,8 @@ https://bjguahao.0x7c00.cn/
     {
         "username":"185xxxxxxx",
         "password":"*******",
-        "date":"2017-02-17",            # 挂号日期
-        "hospitalId":"142",             # 142 北医三院
+        "date":"2017-02-17",            # 挂号日期，当 date='latest' 时，自动挂最新一日
+        "hospitalId":"142",             # 142 北医三院
         "departmentId":"200039602",     # 运动医学科
         "dutyCode":"1",                 # 1:上午  2:下午
         "patientName":"张三",           # 就诊人姓名,可不填,适配多就诊人情况
