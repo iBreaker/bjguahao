@@ -7,7 +7,9 @@
         "departmentId":"200039602",
         "dutyCode":"1",
         "patientName":"",
-
+        "childrenName":"",
+        "cidType":"1",
+        "childrenIdNo":"",
 
         "DebugLevel":"info"
     }

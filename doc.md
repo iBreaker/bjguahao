@@ -85,5 +85,38 @@ Cookie: SESSION_COOKIE=3cab1829cea36adbceb47f7e; Hm_lvt_bc7eaca5ef5a22b54dd6ca44
 hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
 ```
 ### 挂号
+```
+dutySourceId:46882064
+hospitalId:102
+departmentId:200039730
+doctorId:201125970
+patientId:123321123
+jytCardId:
+medicareCardId:
+reimbursementType:1
+smsVerifyCode:326814
+childrenName:
+cidType:1
+childrenIdNo:
+childrenBirthday:2011-07-03
+childrenGender:2
+isAjax:true
+```
+|------|----|-----|
+|dutySourceId|当天医生挂号页面ID|46882064|
+|hospitalId|医院ID|270|
+|departmentId|科室ID|200003874|
+|doctorId|医生ID|201125970|
+|patientId|挂号人ID|123321123|
+|jytCardId|京医通号码|xxxxxxxxxxxx|
+|medicareCardId|医保卡号码|xxxxxxxxxxx|
+|reimbursementType|报销类型|1.医疗保险、2.商业保险、3.公费医疗、4.新农合、5.异地医保、6.红本医疗、7.工伤、8.一老一小、9.超转、10.自费、11.生育险、12.其他|
+|smsVerifyCode|短信验证码|326814|
+|childrenName|患儿名称|当需要挂儿研所这类医院时需要|
+|cidType|患儿证件类型|1为身份证 2为其他|
+|childrenIdNo|患儿身份证|18位身份证|
+|childrenBirthday|患儿生日|当cidType为2时此项为必填|
+|childrenGender|患儿性别|1为男，2为女。当cidType为2时此项为必填|
+|isAjax|是个谜|true就好|
 
 ### 关于验证码
