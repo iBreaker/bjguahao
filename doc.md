@@ -85,23 +85,8 @@ Cookie: SESSION_COOKIE=3cab1829cea36adbceb47f7e; Hm_lvt_bc7eaca5ef5a22b54dd6ca44
 hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
 ```
 ### 挂号
-```
-dutySourceId:46882064
-hospitalId:102
-departmentId:200039730
-doctorId:201125970
-patientId:123321123
-jytCardId:
-medicareCardId:
-reimbursementType:1
-smsVerifyCode:326814
-childrenName:
-cidType:1
-childrenIdNo:
-childrenBirthday:2011-07-03
-childrenGender:2
-isAjax:true
-```
+
+|参数名|含义|举个栗子|
 |------|----|-----|
 |dutySourceId|当天医生挂号页面ID|46882064|
 |hospitalId|医院ID|270|
