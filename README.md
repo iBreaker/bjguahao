@@ -54,6 +54,15 @@ https://bjguahao.0x7c00.cn/
 
 开发者请将`config.json`配置文件中的`DebugLevel`参数设置为`debug`
 
+## 加入我们
+
+在使用过程中有任何问题建议，或者共享代码，请加入交流群
+
+
+![image](https://github.com/iBreaker/bjguahao/raw/master/img/qq-qun.png)
+
+
+
 ## 协议
 
 bjguahao 基于 GPL-3.0 协议进行分发和使用，更多信息参见协议文件。
