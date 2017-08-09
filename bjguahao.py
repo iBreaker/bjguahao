@@ -33,6 +33,9 @@ class Config(object):
         self.conf_path = ""
         self.patient_name = ""
         self.patient_id = ""
+        self.childrenName = ""
+        self.cidType = ""
+        self.childrenIdNo = ""
 
     def load_conf(self, config_path):
         """
@@ -50,6 +53,9 @@ class Config(object):
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
+                self.childrenName = data["childrenName"]
+                self.cidType = data["cidType"]
+                self.childrenIdNo = data["childrenIdNo"]
 
                 Log.info("配置加载完成")
                 Log.debug("手机号:" + str(self.mobile_no ))
@@ -58,6 +64,9 @@ class Config(object):
                 Log.debug("科室id:" + str(self.department_id))
                 Log.debug("上午/下午:" + str(self.duty_code))
                 Log.debug("就诊人姓名:" + str(self.patient_name))
+                Log.debug("患儿姓名:" + str(self.childrenName))
+                Log.debug("患儿证件:" + str(self.cidType))
+                Log.debug("患儿证件号码:" + str(self.childrenIdNo))
 
     	except  Exception, e:
             Log.exit(repr(e))
@@ -170,20 +179,41 @@ class Guahao(object):
         department_id = self.config.department_id
         patient_id = self.config.patient_id
         doctor_id = str(doctor['doctorId'])
+        childrenName = self.config.childrenName
+        cidType = self.config.cidType
+        childrenIdNo = self.config.childrenIdNo
 
-        preload = {
-            'dutySourceId':duty_source_id,
-            'hospitalId':hospital_id ,
-            'departmentId': department_id,
-            'doctorId': doctor_id,
-            'patientId': patient_id,
-            'hospitalCardId': "",
-            'medicareCardId': "",
-            "reimbursementType":"10",       # 报销类型
-            'smsVerifyCode': sms_code,        # TODO 获取验证码
-            'childrenBirthday':"",
-			'isAjax': True
-        }
+        if childrenName:
+            preload = {
+                'dutySourceId':duty_source_id,
+                'hospitalId':hospital_id ,
+                'departmentId': department_id,
+                'doctorId': doctor_id,
+                'patientId': patient_id,
+                'hospitalCardId': "",
+                'medicareCardId': "",
+                "reimbursementType":"1",       # 报销类型
+                'smsVerifyCode': sms_code,        # TODO 获取验证码
+                'childrenBirthday':"",
+                'childrenName': childrenName,
+                'cidType': cidType,
+                'childrenIdNo': childrenIdNo,
+    			'isAjax': True
+            }
+        else:
+            preload = {
+                'dutySourceId':duty_source_id,
+                'hospitalId':hospital_id ,
+                'departmentId': department_id,
+                'doctorId': doctor_id,
+                'patientId': patient_id,
+                'hospitalCardId': "",
+                'medicareCardId': "",
+                "reimbursementType":"1",       # 报销类型
+                'smsVerifyCode': sms_code,        # TODO 获取验证码
+                'childrenBirthday':"",
+    			'isAjax': True
+            }
         response = self.browser.post(self.confirm_url , data=preload)
         Log.debug("response data:" +  response.text)
 
@@ -262,7 +292,7 @@ class Guahao(object):
         Log.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             Log.info("获取验证码成功")
-            return raw_input("输入短信验证码: ")
+            return raw_input("输入短信验证码: ".decode('utf-8').encode('gbk'))
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             Log.exit(data["msg"])
         else:
