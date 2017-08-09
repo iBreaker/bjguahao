@@ -86,6 +86,10 @@ hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
 ```
 ### 挂号
 
+<<<<<<< HEAD
+=======
+|参数名|含义|举个栗子|
+>>>>>>> 0a25abbb7cd9a545b7cd45e05ad9d6467e317c9e
 |------|----|-----|
 |dutySourceId|当天医生挂号页面ID|46882064|
 |hospitalId|医院ID|270|
