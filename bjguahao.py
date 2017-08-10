@@ -292,7 +292,10 @@ class Guahao(object):
         Log.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             Log.info("获取验证码成功")
-            return raw_input("输入短信验证码: ".decode('utf-8').encode('gbk'))
+            if sys.getfilesystemencoding() == 'mbcs':
+                return raw_input("输入短信验证码: ".decode('utf-8').encode('gbk'))
+            else:
+                return raw_input("输入短信验证码: ".decode('utf-8'))
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             Log.exit(data["msg"])
         else:
