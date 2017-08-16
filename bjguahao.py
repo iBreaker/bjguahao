@@ -294,7 +294,6 @@ class Guahao(object):
         doctor = "";
         while True:
             doctor = self.select_doctor()            # 2. 选择医生
-	    self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
                 Log.error("没号了,  亲~")
                 break
@@ -302,6 +301,7 @@ class Guahao(object):
                 Log.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                self.get_patient_id(doctor)  # 3. 获取病人id
                 sms_code = self.get_sms_verify_code()               # 获取验证码
                 if sms_code == None:
                     time.sleep(1)
