@@ -287,6 +287,9 @@ class Guahao(object):
             if sleep_time > 0:
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
+	    # 自动重新登录
+	    if sleep_time > 1000:
+		self.auth_login()
 
         doctor = "";
         while True:
