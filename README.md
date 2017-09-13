@@ -41,6 +41,7 @@ https://bjguahao.0x7c00.cn/
         "departmentId":"200039602",     # 运动医学科
         "dutyCode":"1",                 # 1:上午  2:下午
         "patientName":"张三",           # 就诊人姓名,可不填,适配多就诊人情况
+        "doctorName":"李时珍",           # 优先选择的专家姓名,可不填
 
 
         "DebugLevel":"info"             # debug / info / error
