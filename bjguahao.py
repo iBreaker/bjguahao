@@ -279,9 +279,9 @@ class Guahao(object):
 
 
         self.auth_login()                       # 1. 登陆
-
-        if self.start_time > datetime.datetime.now():
-            seconds =  (self.start_time -  datetime.datetime.now()).total_seconds()
+        curTime = datetime.datetime.now() + datetime.timedelta(seconds=int(time.timezone + 8*60*60)) 
+        if self.start_time > curTime:
+            seconds =  (self.start_time -  curTime).total_seconds()
             Log.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
             if sleep_time > 0:
