@@ -33,6 +33,7 @@ class Config(object):
         self.conf_path = ""
         self.patient_name = ""
         self.patient_id = ""
+        self.doctorName = ""
 
     def load_conf(self, config_path):
         """
@@ -50,6 +51,7 @@ class Config(object):
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
+                self.doctorName = data["doctorName"]
 
                 Log.info("配置加载完成")
                 Log.debug("手机号:" + str(self.mobile_no ))
@@ -144,6 +146,10 @@ class Guahao(object):
 
         self.print_doctor()
 
+        for doctor in self.dutys[::-1]:
+            if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
+                Log.info(u"选中:" + str(doctor["doctorName"]))
+                return doctor
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
                 Log.info(u"选中:" + str(doctor["doctorName"]))
@@ -279,9 +285,9 @@ class Guahao(object):
 
 
         self.auth_login()                       # 1. 登陆
-
-        if self.start_time > datetime.datetime.now():
-            seconds =  (self.start_time -  datetime.datetime.now()).total_seconds()
+        curTime = datetime.datetime.now() + datetime.timedelta(seconds=int(time.timezone + 8*60*60)) 
+        if self.start_time > curTime:
+            seconds =  (self.start_time -  curTime).total_seconds()
             Log.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
             if sleep_time > 0:
