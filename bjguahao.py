@@ -33,6 +33,7 @@ class Config(object):
         self.conf_path = ""
         self.patient_name = ""
         self.patient_id = ""
+        self.doctorName = ""
 
     def load_conf(self, config_path):
         """
@@ -50,6 +51,7 @@ class Config(object):
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
+                self.doctorName = data["doctorName"]
 
                 Log.info("配置加载完成")
                 Log.debug("手机号:" + str(self.mobile_no ))
@@ -144,6 +146,10 @@ class Guahao(object):
 
         self.print_doctor()
 
+        for doctor in self.dutys[::-1]:
+            if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
+                Log.info(u"选中:" + str(doctor["doctorName"]))
+                return doctor
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
                 Log.info(u"选中:" + str(doctor["doctorName"]))
@@ -287,6 +293,9 @@ class Guahao(object):
             if sleep_time > 0:
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
+	    # 自动重新登录
+	    if sleep_time > 1000:
+		self.auth_login()
 
         doctor = "";
         while True:
