@@ -55,6 +55,10 @@ https://bjguahao.0x7c00.cn/
 
 [ChangeLog](ChangeLog.md) release版本更新内容
 
+## 挂号攻略
+
+[攻略](tips.md) 中有详细的挂号攻略, 感谢[@lily0101](https://github.com/lily0101)提供
+
 ## 调试
 
 开发者请将`config.json`配置文件中的`DebugLevel`参数设置为`debug`
