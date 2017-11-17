@@ -6,9 +6,6 @@ import json
 import sys
 
 
-reload(sys)
-sys.setdefaultencoding( "utf-8" )
-
 class Debug_level():
     debug = 1
     info = 2
@@ -18,13 +15,14 @@ class Debug_level():
 global debug_level
 global filesystemencoding
 
+
 class Log(object):
     """
     日志
     """
 
     @staticmethod
-    def load_config(config_path):
+    def load_config(config_path="config.yaml"):
         """获取log配置"""
         global debug_level
         global filesystemencoding
@@ -45,11 +43,10 @@ class Log(object):
                 Log.info("DebugLevel设置为:" + str(debug_level))
                 Log.debug("DebugTest" )
 
-    	except  Exception, e:
+        except  Exception as e:
             debug_level = Debug_level.info
             Log.error(repr(e))
             Log.error("获取Log模块配置失败，DebugLevel设置为默认值:info")
-
 
     @staticmethod
     def get_time():
@@ -90,7 +87,6 @@ class Log(object):
         msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.debug:
             print("\033[0;34m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
-
 
     @staticmethod
     def error(msg):

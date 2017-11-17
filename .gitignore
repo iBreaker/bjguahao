@@ -3,3 +3,5 @@
 
 *.cookies
 *.pyc
+.idea/
+.config.yaml
