@@ -216,6 +216,8 @@ class Guahao(object):
 
     def get_patient_id(self, doctor):
         """获取就诊人Id"""
+        if isinstance(doctor, str):
+            self.logger.exit("没号了,  亲~")
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
