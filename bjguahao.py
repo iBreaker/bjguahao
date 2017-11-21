@@ -82,11 +82,51 @@ class Guahao(object):
 
         self.config = Config(config_path)                       # config对象
 
+    def is_login(self):
+        logging.info("开始检查是否已经登录")
+        hospital_id = self.config.hospital_id
+        department_id = self.config.department_id
+        duty_code = self.config.duty_code
+        duty_date = self.config.date
+
+        # log current date
+        logging.debug("当前挂号日期: " + self.config.date)
+
+        preload = {
+            'hospitalId':hospital_id ,
+            'departmentId': department_id,
+            'dutyCode': duty_code,
+            'dutyDate': duty_date,
+            'isAjax': True
+        }
+        response = self.browser.post(self.get_doctor_url , data=preload)
+        logging.debug("response data:" +  response.text)
+        try:
+            data = json.loads(response.text)
+            if data["code"] == 200 and data["msg"] == "OK":
+                return True
+            else:
+                return False
+        except Exception as e:
+            logging.error(e)
+            return False
+
     def auth_login(self):
         """
         登陆
         """
-        logging.info("开始登陆")
+        try:
+            cookies_file = os.path.join( "." + self.config.mobile_no + ".cookies")
+            self.browser.load_cookies(cookies_file)
+            if self.is_login() == True:
+                logging.info("cookies登录成功")
+                return True
+        except:
+            pass
+        else:
+            logging.info("cookies登录失败")
+
+        logging.info("开始使用账号密码登陆")
         password = self.config.password
         mobile_no = self.config.mobile_no
         preload = {
@@ -149,11 +189,11 @@ class Guahao(object):
 
         for doctor in self.dutys[::-1]:
             if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
-                self.logger.info(u"选中:" + str(doctor["doctorName"]))
+                self.logger.info("选中:" + str(doctor["doctorName"]))
                 return doctor
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
-                self.logger.info(u"选中:" + str(doctor["doctorName"]))
+                self.logger.info("选中:" + str(doctor["doctorName"]))
                 return doctor
         return "NoDuty"
 
