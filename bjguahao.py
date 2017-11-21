@@ -162,7 +162,7 @@ class Guahao(object):
         duty_date = self.config.date
 
     # log current date
-        self.logger.debug("当前挂号日期: " + self.config.date)
+        logging.debug("当前挂号日期: " + self.config.date)
 
         preload = {
             'hospitalId':hospital_id ,
@@ -172,7 +172,7 @@ class Guahao(object):
             'isAjax': True
         }
         response = self.browser.post(self.get_doctor_url , data=preload)
-        self.logger.debug("response data:" +  response.text)
+        logging.debug("response data:" +  response.text)
 
         try:
             data = json.loads(response.text)
@@ -180,7 +180,8 @@ class Guahao(object):
                 self.dutys = data["data"]
 
         except Exception as e:
-            self.logger.exit(repr(e))
+            logging.error(repr(e))
+            exit()
 
         if len(self.dutys) == 0:
             return "NotReady"
@@ -189,17 +190,17 @@ class Guahao(object):
 
         for doctor in self.dutys[::-1]:
             if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
-                self.logger.info("选中:" + str(doctor["doctorName"]))
+                logging.info("选中:" + str(doctor["doctorName"]))
                 return doctor
         for doctor in self.dutys[::-1]:
             if doctor['remainAvailableNumber']:
-                self.logger.info("选中:" + str(doctor["doctorName"]))
+                logging.info("选中:" + str(doctor["doctorName"]))
                 return doctor
         return "NoDuty"
 
     def print_doctor(self):
 
-        self.logger.info("当前号余量:")
+        logging.info("当前号余量:")
         x = PrettyTable()
         x.border = True
         x.field_names = ["医生姓名", "擅长", "号余量"]
@@ -232,7 +233,7 @@ class Guahao(object):
             'isAjax': True
         }
         response = self.browser.post(self.confirm_url , data=preload)
-        self.logger.debug("response data:" +  response.text)
+        logging.debug("response data:" +  response.text)
 
         try:
             data = json.loads(response.text)
@@ -291,11 +292,11 @@ class Guahao(object):
 
         today = datetime.date.today()
 
-    # 优先确认最新可挂号日期
+        # 优先确认最新可挂号日期
         self.stop_date = today + datetime.timedelta(days=int(appoint_day))
         logging.info("今日可挂号到: " + self.stop_date.strftime("%Y-%m-%d"))
 
-    # 自动挂最新一天的号
+        # 自动挂最新一天的号
         if self.config.date == 'latest':
             self.config.date = self.stop_date.strftime("%Y-%m-%d")
             logging.info("当前挂号日期变更为: " + self.config.date)
@@ -311,12 +312,13 @@ class Guahao(object):
         data = json.loads(response.text)
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
-            self.logger.info("获取验证码成功")
-            return raw_input("输入短信验证码: ")
+            logging.info("获取验证码成功")
+            return input("输入短信验证码: ")
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
-            self.logger.exit(data["msg"])
+            logging.error(data["msg"])
+            exit()
         else:
-            self.logger.error(data["msg"])
+            logging.error(data["msg"])
             return None
 
     def run(self):
@@ -332,8 +334,7 @@ class Guahao(object):
             if sleep_time > 0:
                 logging.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
-            # 自动重新登录
-            if sleep_time > 1000:
+                # 自动重新登录
                 self.auth_login()
 
         doctor = "";
