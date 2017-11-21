@@ -13,55 +13,54 @@ import time
 import datetime
 import logging
 
-from log import Log
 from browser import Browser
 from lib.prettytable import PrettyTable
 
 
 class Config(object):
-    """
-    配置
-    """
-    def __init__(self):
-        self.mobile_no = ""
-        self.password = ""
-        self.date = ""
-        self.hospital_id = ""
-        self.department_id = ""
-        self.duty_code = ""
-        self.conf_path = ""
-        self.patient_name = ""
-        self.patient_id = ""
-        self.doctorName = ""
 
-    def load_conf(self, config_path):
-        """
-        加载配置
-        """
+    def __init__(self, config_path):
+        try:
+           with open(config_path, "r", encoding="utf-8") as yaml_file:
+                data = yaml.load(yaml_file)
 
-#        try:
-        with open(config_path, "r", encoding="utf-8") as yaml_file:
-            data = yaml.load(yaml_file)
-            self.mobile_no = data["username"]
-            self.password = data["password"]
-            self.date = data["date"]
-            self.hospital_id = data["hospitalId"]
-            self.department_id = data["departmentId"]
-            self.duty_code = data["dutyCode"]
-            self.patient_name = data["patientName"]
-            self.doctorName = data["doctorName"]
+                debug_level = data["DebugLevel"]
+                if debug_level == "debug":
+                    self.debug_level = logging.DEBUG
+                elif debug_level == "info":
+                    self.debug_level = logging.INFO
+                elif debug_level == "warning":
+                    self.debug_level = logging.WARNING
+                elif debug_level == "error":
+                    self.debug_level = logging.ERROR
+                elif debug_level == "critical":
+                    self.debug_level = logging.CRITICAL
 
-            logging.info("配置加载完成")
-            logging.debug("手机号:" + str(self.mobile_no ))
-            logging.debug("挂号日期:" + str(self.date))
-            logging.debug("医院id:" + str(self.hospital_id))
-            logging.debug("科室id:" + str(self.department_id))
-            logging.debug("上午/下午:" + str(self.duty_code))
-            logging.debug("就诊人姓名:" + str(self.patient_name))
+                logging.basicConfig(level=logging.DEBUG,
+                                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                                    datefmt='%a, %d %b %Y %H:%M:%S')
 
-#        except  Exception as e:
-#            logging.error(repr(e))
-#            exit()
+                self.mobile_no = data["username"]
+                self.password = data["password"]
+                self.date = data["date"]
+                self.hospital_id = data["hospitalId"]
+                self.department_id = data["departmentId"]
+                self.duty_code = data["dutyCode"]
+                self.patient_name = data["patientName"]
+                self.doctorName = data["doctorName"]
+
+                logging.info("配置加载完成")
+                logging.debug("手机号:" + str(self.mobile_no ))
+                logging.debug("挂号日期:" + str(self.date))
+                logging.debug("医院id:" + str(self.hospital_id))
+                logging.debug("科室id:" + str(self.department_id))
+                logging.debug("上午/下午:" + str(self.duty_code))
+                logging.debug("就诊人姓名:" + str(self.patient_name))
+                logging.debug("所选医生:" + str(self.doctorName))
+
+        except  Exception as e:
+            logging.error(repr(e))
+            exit()
 
 
 class Guahao(object):
@@ -81,17 +80,13 @@ class Guahao(object):
         self.patient_id_url = "http://www.bjguahao.gov.cn/order/confirm/"
         self.department_url = "http://www.bjguahao.gov.cn/dpt/appoint/"
 
-        config = Config()                       # config对象
-        config.load_conf(config_path)                      # 加载配置
-        self.config = config
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
+        self.config = Config(config_path)                       # config对象
 
     def auth_login(self):
         """
         登陆
         """
-        self.logger.info("开始登陆")
+        logging.info("开始登陆")
         password = self.config.password
         mobile_no = self.config.mobile_no
         preload = {
@@ -101,20 +96,21 @@ class Guahao(object):
             'isAjax': True,
         }
         response = self.browser.post(self.login_url, data=preload)
-        self.logger.debug("response data:" +  response.text)
+        logging.debug("response data:" +  response.text)
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
-                cookies_file = os.path.join(self.browser.root_path, self.config.mobile_no + ".cookies")
+                cookies_file = os.path.join( "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
-                self.logger.info("登陆成功")
+                logging.info("登陆成功")
                 return True
             else:
-                self.logger.error(data["msg"])
+                logging.error(data["msg"])
                 raise Exception()
 
         except Exception as e:
-            self.logger.error("登陆失败")
+            logging.error(e)
+            logging.error("登陆失败")
             exit()
 
     def select_doctor(self):
@@ -257,23 +253,23 @@ class Guahao(object):
 
     # 优先确认最新可挂号日期
         self.stop_date = today + datetime.timedelta(days=int(appoint_day))
-        self.logger.info("今日可挂号到: " + self.stop_date.strftime("%Y-%m-%d"))
+        logging.info("今日可挂号到: " + self.stop_date.strftime("%Y-%m-%d"))
 
     # 自动挂最新一天的号
         if self.config.date == 'latest':
             self.config.date = self.stop_date.strftime("%Y-%m-%d")
-            self.logger.info("当前挂号日期变更为: " + self.config.date)
+            logging.info("当前挂号日期变更为: " + self.config.date)
 
         # 生成放号时间和程序开始时间
         con_data_str = self.config.date + " " + refresh_time + ":00"
         self.start_time =  datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days= - int(appoint_day))
-        self.logger.info("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
+        logging.info("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
         response = self.browser.post(self.send_code_url, "")
         data = json.loads(response.text)
-        self.logger.debug(response.text)
+        logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             self.logger.info("获取验证码成功")
             return raw_input("输入短信验证码: ")
@@ -291,10 +287,10 @@ class Guahao(object):
 
         if self.start_time > curTime:
             seconds =  (self.start_time -  curTime).total_seconds()
-            self.logger.info("距离放号时间还有" + str(seconds) + "秒")
+            logging.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
             if sleep_time > 0:
-                self.logger.info("程序休眠" + str(sleep_time) + "秒后开始运行")
+                logging.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
             # 自动重新登录
             if sleep_time > 1000:
@@ -305,10 +301,10 @@ class Guahao(object):
             doctor = self.select_doctor()            # 2. 选择医生
             self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
-                self.logger.error("没号了,  亲~")
+                logging.error("没号了,  亲~")
                 break
             elif doctor == "NotReady":
-                self.logger.info("好像还没放号？重试中")
+                logging.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
                 sms_code = self.get_sms_verify_code()               # 获取验证码

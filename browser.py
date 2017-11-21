@@ -2,13 +2,8 @@
 # -*- coding: utf-8
 
 
-import os
-import sys
 import pickle
 import requests
-import logging
-
-from log import  Log
 
 
 class Browser(object):
@@ -17,14 +12,11 @@ class Browser(object):
     """
 
     def __init__(self):
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
         self.session = requests.Session()
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         }
-        self.root_path = os.path.dirname(os.path.realpath(sys.argv[0]))
 
     def load_cookies(self, path):
         with open(path, 'rb') as f:
@@ -49,7 +41,6 @@ class Browser(object):
         """
         http post
         """
-        self.logger.debug("post data :" +  str(data))
         response = self.session.post(url, data=data)
         if response.status_code == 200:
             self.session.headers['Referer'] = response.url
