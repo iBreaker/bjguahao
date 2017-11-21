@@ -83,6 +83,7 @@ class Guahao(object):
         self.config = Config(config_path)                       # config对象
 
     def is_login(self):
+
         logging.info("开始检查是否已经登录")
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
@@ -155,13 +156,12 @@ class Guahao(object):
 
     def select_doctor(self):
         """选择合适的大夫"""
-
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         duty_code = self.config.duty_code
         duty_date = self.config.date
 
-    # log current date
+        # log current date
         logging.debug("当前挂号日期: " + self.config.date)
 
         preload = {
