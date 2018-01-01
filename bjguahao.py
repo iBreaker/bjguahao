@@ -7,21 +7,35 @@
 import os
 import sys
 import re
-import yaml
 import json
 import time
 import datetime
 import logging
-
 from browser import Browser
 from lib.prettytable import PrettyTable
+
+if sys.version_info.major != 3:
+    logging.error("请在python3环境下运行本程序")
+    exit(-1)
+
+try:
+    import yaml
+except ModuleNotFoundError as e:
+    logging.error("请安装python3 yaml模块")
+    exit(-1)
+
+try:
+    import requests
+except ModuleNotFoundError as e:
+    logging.error("请安装python3 requests")
+    exit(-1)
 
 
 class Config(object):
 
     def __init__(self, config_path):
         try:
-           with open(config_path, "r", encoding="utf-8") as yaml_file:
+            with open(config_path, "r", encoding="utf-8") as yaml_file:
                 data = yaml.load(yaml_file)
 
                 debug_level = data["DebugLevel"]
@@ -48,9 +62,10 @@ class Config(object):
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
                 self.doctorName = data["doctorName"]
+                self.patient_id = int()
 
                 logging.info("配置加载完成")
-                logging.debug("手机号:" + str(self.mobile_no ))
+                logging.debug("手机号:" + str(self.mobile_no))
                 logging.debug("挂号日期:" + str(self.date))
                 logging.debug("医院id:" + str(self.hospital_id))
                 logging.debug("科室id:" + str(self.department_id))
@@ -58,7 +73,7 @@ class Config(object):
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
 
-        except  Exception as e:
+        except Exception as e:
             logging.error(repr(e))
             exit()
 
@@ -85,7 +100,6 @@ class Guahao(object):
     def is_login(self):
 
         logging.info("开始检查是否已经登录")
-        hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         duty_code = self.config.duty_code
         duty_date = self.config.date
@@ -93,20 +107,21 @@ class Guahao(object):
         # log current date
         logging.debug("当前挂号日期: " + self.config.date)
 
-        preload = {
-            'hospitalId':hospital_id ,
+        payload = {
             'departmentId': department_id,
             'dutyCode': duty_code,
             'dutyDate': duty_date,
             'isAjax': True
         }
-        response = self.browser.post(self.get_doctor_url , data=preload)
-        logging.debug("response data:" +  response.text)
+        response = self.browser.post(self.get_doctor_url, data=payload)
+
         try:
             data = json.loads(response.text)
             if data["code"] == 200 and data["msg"] == "OK":
+                logging.debug("response data:" + response.text)
                 return True
             else:
+                logging.debug("response data: HTML body")
                 return False
         except Exception as e:
             logging.error(e)
@@ -117,31 +132,30 @@ class Guahao(object):
         登陆
         """
         try:
-            cookies_file = os.path.join( "." + self.config.mobile_no + ".cookies")
+            cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
             self.browser.load_cookies(cookies_file)
-            if self.is_login() == True:
+            if self.is_login():
                 logging.info("cookies登录成功")
                 return True
-        except:
+        except Exception as e:
             pass
-        else:
-            logging.info("cookies登录失败")
 
+        logging.info("cookies登录失败")
         logging.info("开始使用账号密码登陆")
         password = self.config.password
         mobile_no = self.config.mobile_no
-        preload = {
+        payload = {
             'mobileNo': mobile_no,
             'password': password,
-            'yzm':'',
+            'yzm': '',
             'isAjax': True,
         }
-        response = self.browser.post(self.login_url, data=preload)
-        logging.debug("response data:" +  response.text)
+        response = self.browser.post(self.login_url, data=payload)
+        logging.debug("response data:" + response.text)
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
-                cookies_file = os.path.join( "." + self.config.mobile_no + ".cookies")
+            if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
+                cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
                 logging.info("登陆成功")
                 return True
@@ -152,7 +166,7 @@ class Guahao(object):
         except Exception as e:
             logging.error(e)
             logging.error("登陆失败")
-            exit()
+            exit(-1)
 
     def select_doctor(self):
         """选择合适的大夫"""
@@ -164,19 +178,19 @@ class Guahao(object):
         # log current date
         logging.debug("当前挂号日期: " + self.config.date)
 
-        preload = {
-            'hospitalId':hospital_id ,
+        payload = {
+            'hospitalId': hospital_id,
             'departmentId': department_id,
             'dutyCode': duty_code,
             'dutyDate': duty_date,
             'isAjax': True
         }
-        response = self.browser.post(self.get_doctor_url , data=preload)
-        logging.debug("response data:" +  response.text)
+        response = self.browser.post(self.get_doctor_url, data=payload)
+        logging.debug("response data:" + response.text)
 
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
+            if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
                 self.dutys = data["data"]
 
         except Exception as e:
@@ -219,7 +233,7 @@ class Guahao(object):
         patient_id = self.config.patient_id
         doctor_id = str(doctor['doctorId'])
 
-        preload = {
+        payload = {
             'dutySourceId':duty_source_id,
             'hospitalId':hospital_id ,
             'departmentId': department_id,
@@ -232,23 +246,21 @@ class Guahao(object):
             'childrenBirthday':"",
             'isAjax': True
         }
-        response = self.browser.post(self.confirm_url , data=preload)
-        logging.debug("response data:" +  response.text)
+        response = self.browser.post(self.confirm_url, data=payload)
+        logging.debug("response data:" + response.text)
 
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
-                self.logger.info("挂号成功")
+                logging.info("挂号成功")
                 return True
             else:
-                self.logger.error(data["msg"])
+                logging.error(data["msg"])
                 return False
 
         except Exception as e:
-            self.logger.error(repr(e))
+            logging.error(repr(e))
             time.sleep(1)
-
-
 
     def gen_doctor_url(self, doctor):
 
@@ -260,7 +272,8 @@ class Guahao(object):
 
         """获取就诊人Id"""
         if isinstance(doctor, str):
-            self.logger.exit("没号了,  亲~")
+            logging.error("没号了,  亲~")
+            exit(-1)
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
@@ -269,7 +282,7 @@ class Guahao(object):
             exit("获取患者id失败")
         else:
             self.config.patient_id = m.group('patientId')
-            self.logger.info( "病人ID:" + self.config.patient_id)
+            logging.info( "病人ID:" + self.config.patient_id)
 
             return self.config.patient_id
 
@@ -328,7 +341,7 @@ class Guahao(object):
         curTime = datetime.datetime.now() + datetime.timedelta(seconds=int(time.timezone + 8*60*60))
 
         if self.start_time > curTime:
-            seconds =  (self.start_time -  curTime).total_seconds()
+            seconds = (self.start_time - curTime).total_seconds()
             logging.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
             if sleep_time > 0:
@@ -337,7 +350,7 @@ class Guahao(object):
                 # 自动重新登录
                 self.auth_login()
 
-        doctor = "";
+        doctor = ""
         while True:
             doctor = self.select_doctor()            # 2. 选择医生
             self.get_patient_id(doctor)         # 3. 获取病人id
@@ -349,12 +362,13 @@ class Guahao(object):
                 time.sleep(1)
             else:
                 sms_code = self.get_sms_verify_code()               # 获取验证码
-                if sms_code == None:
+                if sms_code is None:
                     time.sleep(1)
 
                 result = self.get_it(doctor, sms_code)                 # 4.挂号
-                if result == True:
+                if result:
                     break                                    # 挂号成功
+
 
 if __name__ == "__main__":
 
@@ -364,4 +378,3 @@ if __name__ == "__main__":
     else:
         guahao = Guahao()
     guahao.run()
-
