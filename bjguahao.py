@@ -16,19 +16,19 @@ from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
     logging.error("请在python3环境下运行本程序")
-    exit(-1)
+    sys.exit(-1)
 
 try:
     import yaml
 except ModuleNotFoundError as e:
     logging.error("请安装python3 yaml模块")
-    exit(-1)
+    sys.exit(-1)
 
 try:
     import requests
 except ModuleNotFoundError as e:
     logging.error("请安装python3 requests")
-    exit(-1)
+    sys.exit(-1)
 
 
 class Config(object):
@@ -73,9 +73,13 @@ class Config(object):
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
 
+                if not self.date:
+                    logging.error("请填写挂号时间")
+                    exit(-1)
+
         except Exception as e:
             logging.error(repr(e))
-            exit()
+            sys.exit()
 
 
 class Guahao(object):
@@ -100,21 +104,20 @@ class Guahao(object):
     def is_login(self):
 
         logging.info("开始检查是否已经登录")
+        hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         duty_code = self.config.duty_code
         duty_date = self.config.date
 
-        # log current date
-        logging.debug("当前挂号日期: " + self.config.date)
-
         payload = {
-            'departmentId': department_id,
-            'dutyCode': duty_code,
-            'dutyDate': duty_date,
+            'hospitalId': 142,
+            'departmentId': 200039602,
+            'dutyCode': 1,
+            'dutyDate': time.strftime("%Y-%m-%d"),
             'isAjax': True
         }
-        response = self.browser.post(self.get_doctor_url, data=payload)
 
+        response = self.browser.post(self.get_doctor_url, data=payload)
         try:
             data = json.loads(response.text)
             if data["code"] == 200 and data["msg"] == "OK":
@@ -166,7 +169,7 @@ class Guahao(object):
         except Exception as e:
             logging.error(e)
             logging.error("登陆失败")
-            exit(-1)
+            sys.exit(-1)
 
     def select_doctor(self):
         """选择合适的大夫"""
@@ -185,6 +188,7 @@ class Guahao(object):
             'dutyDate': duty_date,
             'isAjax': True
         }
+
         response = self.browser.post(self.get_doctor_url, data=payload)
         logging.debug("response data:" + response.text)
 
@@ -195,7 +199,7 @@ class Guahao(object):
 
         except Exception as e:
             logging.error(repr(e))
-            exit()
+            sys.exit()
 
         if len(self.dutys) == 0:
             return "NotReady"
@@ -234,16 +238,16 @@ class Guahao(object):
         doctor_id = str(doctor['doctorId'])
 
         payload = {
-            'dutySourceId':duty_source_id,
-            'hospitalId':hospital_id ,
+            'dutySourceId': duty_source_id,
+            'hospitalId': hospital_id,
             'departmentId': department_id,
             'doctorId': doctor_id,
             'patientId': patient_id,
             'hospitalCardId': "",
             'medicareCardId': "",
-            "reimbursementType":"10",       # 报销类型
-            'smsVerifyCode': sms_code,        # TODO 获取验证码
-            'childrenBirthday':"",
+            "reimbursementType": "10",          # 报销类型
+            'smsVerifyCode': sms_code,          # TODO 获取验证码
+            'childrenBirthday': "",
             'isAjax': True
         }
         response = self.browser.post(self.confirm_url, data=payload)
@@ -251,7 +255,7 @@ class Guahao(object):
 
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
+            if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
                 logging.info("挂号成功")
                 return True
             else:
@@ -273,16 +277,16 @@ class Guahao(object):
         """获取就诊人Id"""
         if isinstance(doctor, str):
             logging.error("没号了,  亲~")
-            exit(-1)
+            sys.exit(-1)
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
         m = re.search(u'<input type=\\"radio\\" name=\\"hzr\\" value=\\"(?P<patientId>\d+)\\"[^>]*> ' + self.config.patient_name, ret)
-        if m == None:
-            exit("获取患者id失败")
+        if m is None:
+            sys.exit("获取患者id失败")
         else:
             self.config.patient_id = m.group('patientId')
-            logging.info( "病人ID:" + self.config.patient_id)
+            logging.info("病人ID:" + self.config.patient_id)
 
             return self.config.patient_id
 
@@ -297,10 +301,10 @@ class Guahao(object):
         ret = response.text
 
         # 放号时间
-        m = re.search(u'<span>更新时间：</span>每日(?P<refreshTime>\d{1,2}:\d{2})更新', ret)
+        m = re.search('<span>更新时间：</span>每日(?P<refreshTime>\d{1,2}:\d{2})更新', ret)
         refresh_time = m.group('refreshTime')
         # 放号日期
-        m = re.search(u'<span>预约周期：</span>(?P<appointDay>\d+)<script.*',ret)
+        m = re.search('<span>预约周期：</span>(?P<appointDay>\d+)<script.*', ret)
         appoint_day = m.group('appointDay')
 
         today = datetime.date.today()
@@ -316,7 +320,7 @@ class Guahao(object):
 
         # 生成放号时间和程序开始时间
         con_data_str = self.config.date + " " + refresh_time + ":00"
-        self.start_time =  datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days= - int(appoint_day))
+        self.start_time = datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days= - int(appoint_day))
         logging.info("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
 
     def get_sms_verify_code(self):
@@ -329,19 +333,15 @@ class Guahao(object):
             return input("输入短信验证码: ")
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             logging.error(data["msg"])
-            exit()
+            sys.exit()
         else:
             logging.error(data["msg"])
             return None
 
-    def run(self):
-        """主逻辑"""
-        self.get_duty_time()
-        self.auth_login()                       # 1. 登陆
-        curTime = datetime.datetime.now() + datetime.timedelta(seconds=int(time.timezone + 8*60*60))
-
-        if self.start_time > curTime:
-            seconds = (self.start_time - curTime).total_seconds()
+    def lazy(self):
+        cur_time = datetime.datetime.now() + datetime.timedelta(seconds=int(time.timezone + 8*60*60))
+        if self.start_time > cur_time:
+            seconds = (self.start_time - cur_time).total_seconds()
             logging.info("距离放号时间还有" + str(seconds) + "秒")
             sleep_time = seconds - 60
             if sleep_time > 0:
@@ -349,10 +349,16 @@ class Guahao(object):
                 time.sleep(sleep_time)
                 # 自动重新登录
                 self.auth_login()
+        pass
 
+    def run(self):
+        """主逻辑"""
+        self.get_duty_time()
+        self.auth_login()                       # 1. 登陆
+        self.lazy()
         doctor = ""
         while True:
-            doctor = self.select_doctor()            # 2. 选择医生
+            doctor = self.select_doctor()       # 2. 选择医生
             self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
                 logging.error("没号了,  亲~")
@@ -365,9 +371,9 @@ class Guahao(object):
                 if sms_code is None:
                     time.sleep(1)
 
-                result = self.get_it(doctor, sms_code)                 # 4.挂号
+                result = self.get_it(doctor, sms_code)              # 4.挂号
                 if result:
-                    break                                    # 挂号成功
+                    break                                           # 挂号成功
 
 
 if __name__ == "__main__":
