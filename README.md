@@ -22,31 +22,57 @@ https://bjguahao.0x7c00.cn/
 
 - Python
 
-## 运行
+## 使用方法
 
-- 默认用法： ```python2 bjguahao.py```
-- 指定配置： ```python2 bjguahao.py -c test.json```
+1. 修改配置文件
+2. 运行命令：
+    - 默认用法： ```python2 bjguahao.py```
+    - 指定配置： ```python2 bjguahao.py -c your-conf.yaml```
 
 ## 配置文件
 
-在脚本目录将 `_config.josn` 重命名为 `config.json`, 然后写入如下数据：
+默认配置文件 `config.yaml`
 
-```json
-[
-    {
-        "username":"185xxxxxxx",
-        "password":"*******",
-        "date":"2017-02-17",            # 挂号日期，当 date='latest' 时，自动挂最新一日
-        "hospitalId":"142",             # 142 北医三院
-        "departmentId":"200039602",     # 运动医学科
-        "dutyCode":"1",                 # 1:上午  2:下午
-        "patientName":"张三",           # 就诊人姓名,可不填,适配多就诊人情况
-        "doctorName":"李时珍",           # 优先选择的专家姓名,可不填
+```yaml
+
+# username: 您的的用户名(一般是手机号码)
+username: "13888888888"
+
+# password: 密码
+password: "*****"
+
+# date: 挂号日期
+date: "2018-01-01"
 
 
-        "DebugLevel":"info"             # debug / info / error
-    }
-]
+# hospitalId: 医院id
+hospitalId: "162"
+
+# departmentId: 科室id
+departmentId: "200002248"
+
+# 关于如何获取 hospitalId 和 departmentId
+# 1. 打开挂号页面
+# 2. 假设地址栏中地址是 http://www.bjguahao.gov.cn/dpt/appoint/162-200002248.htm
+# 3. 其中 162 是 hospitalId
+# 4. 其中 200002248 是 departmentId
+
+
+# 需要挂早上的号请填写1  需要挂下午的号请填写2
+dutyCode: "1"
+
+# patientName: 患者姓名
+# 若是自己挂号可为空
+patientName: "曹操"
+
+# doctorName: 医生姓名
+# 不填写的话默认选最好的医生
+# 填写后若这个医生没有号，会自动选其余号中最好的医生
+doctorName: "扁鹊"
+
+# DebugLevel: 调试等级
+# 支持的调试等级有 debug/info/warning/error/critical
+DebugLevel: "info"
 ```
 
 ## 文档
@@ -61,7 +87,7 @@ https://bjguahao.0x7c00.cn/
 
 ## 调试
 
-开发者请将`config.json`配置文件中的`DebugLevel`参数设置为`debug`
+开发者请将`config.yaml`配置文件中的`DebugLevel`参数设置为`debug`
 
 ## 加入我们
 

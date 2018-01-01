@@ -50,7 +50,7 @@ class Config(object):
                 elif debug_level == "critical":
                     self.debug_level = logging.CRITICAL
 
-                logging.basicConfig(level=logging.DEBUG,
+                logging.basicConfig(level=self.debug_level,
                                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                                     datefmt='%a, %d %b %Y %H:%M:%S')
 
@@ -330,7 +330,8 @@ class Guahao(object):
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             logging.info("获取验证码成功")
-            return input("输入短信验证码: ")
+            code = input("输入短信验证码: ")
+            return code
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             logging.error(data["msg"])
             sys.exit()
