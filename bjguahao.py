@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8
+# -*- coding: utf-8 -*-
 """
 北京市预约挂号统一平台
 """
@@ -11,7 +11,6 @@ import json
 import time
 import datetime
 import logging
-from browser import Browser
 from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
@@ -19,15 +18,17 @@ if sys.version_info.major != 3:
     sys.exit(-1)
 
 try:
-    import yaml
-except ModuleNotFoundError as e:
-    logging.error("请安装python3 yaml模块")
-    sys.exit(-1)
-
-try:
     import requests
 except ModuleNotFoundError as e:
     logging.error("请安装python3 requests")
+    sys.exit(-1)
+
+from browser import Browser
+
+try:
+    import yaml
+except ModuleNotFoundError as e:
+    logging.error("请安装python3 yaml模块")
     sys.exit(-1)
 
 
