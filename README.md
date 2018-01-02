@@ -8,7 +8,7 @@ Copyright (C) 2017
 
 https://bjguahao.0x7c00.cn/
 
-**目前还在调试中，没有稳定的版本，欢迎吐槽和试用**
+**目前稳定版已经发布，欢迎吐槽和试用**
 
 * 本程序用于 [北京市预约挂号统一平台](http://www.bjguahao.gov.cn/) 的挂号，只支持北京地区医院的挂号。
 * 挂号是刚需。帝都有些医院号源紧张，放号瞬间被秒杀一空，遂产生了撸一脚本挂号的念头。说干就干，简单的分析和调试后于 16 年 8 月份左右产出第一版，顺利挂上了XXX院运动医学科的号。很开心。
@@ -20,15 +20,16 @@ https://bjguahao.0x7c00.cn/
 
 ## 环境
 
-- Python
+### 正式版已经不支持python2环境，请使用python3运行本程序
+- Python3
 
 ## 使用方法
 
 1. 安装依赖库，例如：``` pip install --user -r requirements.txt ```
 2. 修改配置文件
 3. 运行命令：
-    - 默认用法： ```python3 bjguahao.py```
-    - 指定配置： ```python3 bjguahao.py -c your-conf.yaml```
+    - 默认用法： ```python bjguahao.py```
+    - 指定配置： ```python bjguahao.py -c your-conf.yaml```
 
 ## 配置文件
 
