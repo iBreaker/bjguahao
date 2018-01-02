@@ -24,10 +24,11 @@ https://bjguahao.0x7c00.cn/
 
 ## 使用方法
 
-1. 修改配置文件
-2. 运行命令：
-    - 默认用法： ```python2 bjguahao.py```
-    - 指定配置： ```python2 bjguahao.py -c your-conf.yaml```
+1. 安装依赖库，例如：``` pip install --user -r requirements.txt ```
+2. 修改配置文件
+3. 运行命令：
+    - 默认用法： ```python3 bjguahao.py```
+    - 指定配置： ```python3 bjguahao.py -c your-conf.yaml```
 
 ## 配置文件
 
