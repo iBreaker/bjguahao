@@ -11,6 +11,7 @@ import json
 import time
 import datetime
 import logging
+import imessage
 from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
@@ -64,6 +65,7 @@ class Config(object):
                 self.patient_name = data["patientName"]
                 self.doctorName = data["doctorName"]
                 self.patient_id = int()
+                self.useIMessage = data["useIMessage"]
 
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
@@ -73,6 +75,7 @@ class Config(object):
                 logging.debug("上午/下午:" + str(self.duty_code))
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
+                logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
 
                 if not self.date:
                     logging.error("请填写挂号时间")
@@ -101,6 +104,10 @@ class Guahao(object):
         self.department_url = "http://www.bjguahao.gov.cn/dpt/appoint/"
 
         self.config = Config(config_path)                       # config对象
+        if self.config.useIMessage == 'true':
+            self.imessage = imessage.IMessage()
+        else:
+            self.imessage = None
 
     def is_login(self):
 
@@ -331,7 +338,10 @@ class Guahao(object):
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             logging.info("获取验证码成功")
-            code = input("输入短信验证码: ")
+            if self.imessage is None:
+                code = input("输入短信验证码: ")
+            else:
+                code = self.imessage.get_verify_code()
             return code
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             logging.error(data["msg"])
