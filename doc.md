@@ -87,3 +87,7 @@ hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
 ### 挂号
 
 ### 关于验证码
+目前支持*ios系统*的手机和*osx*系统的电脑自动填写验证码
+##### 配置自动填写验证码
+1.在*osx*系统电脑上登录
+
