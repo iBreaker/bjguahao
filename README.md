@@ -75,6 +75,9 @@ doctorName: "扁鹊"
 # DebugLevel: 调试等级
 # 支持的调试等级有 debug/info/warning/error/critical
 DebugLevel: "info"
+
+#使用ios短信和mac电脑接收验证码
+useIMessage: "false"
 ```
 
 ## 文档
