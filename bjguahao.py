@@ -66,6 +66,7 @@ class Config(object):
                 self.doctorName = data["doctorName"]
                 self.patient_id = int()
                 self.useIMessage = data["useIMessage"]
+                self.useQPython3 = data["useQPython3"]
 
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
@@ -76,6 +77,7 @@ class Config(object):
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
                 logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
+                logging.debug("是否使用 QPython3 运行本脚本:" + str(self.useQPython3))
 
                 if not self.date:
                     logging.error("请填写挂号时间")
@@ -108,6 +110,11 @@ class Guahao(object):
             self.imessage = imessage.IMessage()
         else:
             self.imessage = None
+
+        if self.config.useQPython3 == 'true':
+            self.qpython3 = qpython3.QPython3()
+        else:
+            self.qpython3 = None
 
     def is_login(self):
 
@@ -338,10 +345,12 @@ class Guahao(object):
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             logging.info("获取验证码成功")
-            if self.imessage is None:
-                code = input("输入短信验证码: ")
-            else:
+            if self.imessage is not None: # 如果使用 iMessage
                 code = self.imessage.get_verify_code()
+            elif self.qpython3 is not None: # 如果使用 QPython3
+                code = self.qpython3.get_verify_code()
+            else:
+                code = input("输入短信验证码: ")
             return code
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             logging.error(data["msg"])
