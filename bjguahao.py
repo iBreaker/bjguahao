@@ -381,7 +381,7 @@ class Guahao(object):
                 else:
                     # 未到时间，强制重试
                     logging.debug("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
-                    logging.debug("当前时间: " + datetime.datetime.now())
+                    logging.debug("当前时间: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
                     logging.info("没号了,但截止时间未到，重试中")
                     time.sleep(1)
             elif doctor == "NotReady":
