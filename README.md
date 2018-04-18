@@ -6,8 +6,6 @@
 
 Copyright (C) 2017
 
-https://bjguahao.0x7c00.cn/
-
 **目前稳定版已经发布，欢迎吐槽和试用**
 
 * 本程序用于 [北京市预约挂号统一平台](http://www.bjguahao.gov.cn/) 的挂号，只支持北京地区医院的挂号。
@@ -78,6 +76,9 @@ DebugLevel: "info"
 
 #使用ios短信和mac电脑接收验证码
 useIMessage: "false"
+
+# 是否使用 QPython3 运行本脚本
+useQPython3: "false"
 ```
 
 ## 文档
