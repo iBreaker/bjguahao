@@ -373,8 +373,12 @@ class Guahao(object):
             doctor = self.select_doctor()       # 2. 选择医生
             self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
-                logging.error("没号了,  亲~")
-                break
+                if self.start_time + datetime.timedelta(seconds=30) < datetime.datetime.now():
+                    logging.error("没号了,  亲~")
+                    break
+                else:
+                    logging.info("没号了,但截止时间未到，重试中")
+                    time.sleep(1)
             elif doctor == "NotReady":
                 logging.info("好像还没放号？重试中")
                 time.sleep(1)
