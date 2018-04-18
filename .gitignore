@@ -1,7 +1,6 @@
-*.json
-!_config.json
-
 *.cookies
 *.pyc
 .idea/
-.config.yaml
+*.yaml
+
+!config.yaml
