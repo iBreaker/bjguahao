@@ -65,9 +65,15 @@ class Config(object):
                 self.patient_name = data["patientName"]
                 self.doctorName = data["doctorName"]
                 self.patient_id = int()
-                self.useIMessage = data["useIMessage"]
-                self.useQPython3 = data["useQPython3"]
-
+                try:
+                    self.useIMessage = data["useIMessage"]
+                except KeyError:
+                    self.useIMessage = "false"
+                try:
+                    self.useQPython3 = data["useQPython3"]
+                except KeyError:
+                    self.useQPython3 = "false"
+                
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
                 logging.debug("挂号日期:" + str(self.date))
