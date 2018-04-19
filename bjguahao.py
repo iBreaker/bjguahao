@@ -284,8 +284,9 @@ class Guahao(object):
 
         """获取就诊人Id"""
         if isinstance(doctor, str):
-            logging.error("没号了,  亲~")
-            sys.exit(-1)
+            #logging.error("没号了,  亲~")
+            #sys.exit(-1)
+            return # 无号退出逻辑由上级函数run()负责
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
@@ -373,8 +374,17 @@ class Guahao(object):
             doctor = self.select_doctor()       # 2. 选择医生
             self.get_patient_id(doctor)         # 3. 获取病人id
             if doctor == "NoDuty":
-                logging.error("没号了,  亲~")
-                break
+                # 如果当前时间 > 放号时间 + 30s
+                if self.start_time + datetime.timedelta(seconds=30) < datetime.datetime.now():
+                    # 确认无号，终止程序
+                    logging.error("没号了,  亲~")
+                    break
+                else:
+                    # 未到时间，强制重试
+                    logging.debug("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
+                    logging.debug("当前时间: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+                    logging.info("没号了,但截止时间未到，重试中")
+                    time.sleep(1)
             elif doctor == "NotReady":
                 logging.info("好像还没放号？重试中")
                 time.sleep(1)
