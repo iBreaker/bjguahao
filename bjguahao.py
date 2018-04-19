@@ -11,7 +11,6 @@ import json
 import time
 import datetime
 import logging
-import imessage
 from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
@@ -113,11 +112,15 @@ class Guahao(object):
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
+            # 按需导入 imessage.py
+            import imessage
             self.imessage = imessage.IMessage()
         else:
             self.imessage = None
 
         if self.config.useQPython3 == 'true':
+            # 按需导入 qpython3.py
+            import qpython3
             self.qpython3 = qpython3.QPython3()
         else:
             self.qpython3 = None
