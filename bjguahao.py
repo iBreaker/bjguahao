@@ -284,8 +284,9 @@ class Guahao(object):
 
         """获取就诊人Id"""
         if isinstance(doctor, str):
-            logging.error("没号了,  亲~")
-            sys.exit(-1)
+            #logging.error("没号了,  亲~")
+            #sys.exit(-1)
+            return # 无号退出逻辑由上级函数run()负责
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
