@@ -38,7 +38,6 @@ class Config(object):
         try:
             with open(config_path, "r", encoding="utf-8") as yaml_file:
                 data = yaml.load(yaml_file)
-
                 debug_level = data["DebugLevel"]
                 if debug_level == "debug":
                     self.debug_level = logging.DEBUG
@@ -72,7 +71,7 @@ class Config(object):
                     self.useQPython3 = data["useQPython3"]
                 except KeyError:
                     self.useQPython3 = "false"
-                
+                #
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
                 logging.debug("挂号日期:" + str(self.date))
@@ -119,9 +118,12 @@ class Guahao(object):
             self.imessage = None
 
         if self.config.useQPython3 == 'true':
-            # 按需导入 qpython3.py
-            import qpython3
-            self.qpython3 = qpython3.QPython3()
+            try: # Android QPython3 验证
+                # 按需导入 qpython3.py
+                import qpython3
+                self.qpython3 = qpython3.QPython3()
+            except ModuleNotFoundError:
+                self.qpython3 = None
         else:
             self.qpython3 = None
 
@@ -159,7 +161,8 @@ class Guahao(object):
         登陆
         """
         try:
-            cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
+            # patch for qpython3
+            cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
             self.browser.load_cookies(cookies_file)
             if self.is_login():
                 logging.info("cookies登录成功")
@@ -182,7 +185,8 @@ class Guahao(object):
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
-                cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
+                # patch for qpython3
+                cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
                 logging.info("登陆成功")
                 return True

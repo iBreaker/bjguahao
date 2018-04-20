@@ -29,6 +29,20 @@ Copyright (C) 2017
     - 默认用法： ```python bjguahao.py```
     - 指定配置： ```python bjguahao.py -c your-conf.yaml```
 
+**Android QPython3 使用方法**
+1. 安装 [QPython3](https://play.google.com/store/apps/details?id=org.qpython.qpy3) 和 [QPython](https://play.google.com/store/apps/details?id=org.qpython.qpy)
+2. 安装 [QPy3.6](https://play.google.com/store/apps/details?id=org.qpython.qpy36) 并运行（会安装 Python 3.6）
+3. 在 QPython3 中将版本切为 Python 3.6（默认为 Python 3.2）
+4. 修改配置文件(```config.yaml```或自定义)
+5. 由于 QPython3 不支持传参，如需指定配置文件，需手动修改```qpython3_run.py```中的```config_name```配置文件名
+6. 将整个项目复制到你的 Android
+7. 在 QPython3 中运行```qpython3_run.py```
+
+若配置文件不在项目目录，也可修改```qpython3_run.py```中的```config_path```为配置文件的**绝对**地址，如
+```
+config_path = "/storage/emulated/0/qpython/projects3/bjguahao/custom.yaml"
+```
+
 ## 配置文件
 
 默认配置文件 `config.yaml`
@@ -77,7 +91,7 @@ DebugLevel: "info"
 #使用ios短信和mac电脑接收验证码
 useIMessage: "false"
 
-# 是否使用 QPython3 运行本脚本
+# 是否使用 QPython3.6 运行本脚本
 useQPython3: "false"
 ```
 
