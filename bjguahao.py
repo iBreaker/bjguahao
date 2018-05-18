@@ -11,7 +11,6 @@ import json
 import time
 import datetime
 import logging
-import imessage
 from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
@@ -39,7 +38,6 @@ class Config(object):
         try:
             with open(config_path, "r", encoding="utf-8") as yaml_file:
                 data = yaml.load(yaml_file)
-
                 debug_level = data["DebugLevel"]
                 if debug_level == "debug":
                     self.debug_level = logging.DEBUG
@@ -65,8 +63,15 @@ class Config(object):
                 self.patient_name = data["patientName"]
                 self.doctorName = data["doctorName"]
                 self.patient_id = int()
-                self.useIMessage = data["useIMessage"]
-
+                try:
+                    self.useIMessage = data["useIMessage"]
+                except KeyError:
+                    self.useIMessage = "false"
+                try:
+                    self.useQPython3 = data["useQPython3"]
+                except KeyError:
+                    self.useQPython3 = "false"
+                #
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
                 logging.debug("挂号日期:" + str(self.date))
@@ -76,6 +81,7 @@ class Config(object):
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
                 logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
+                logging.debug("是否使用 QPython3 运行本脚本:" + str(self.useQPython3))
 
                 if not self.date:
                     logging.error("请填写挂号时间")
@@ -105,9 +111,21 @@ class Guahao(object):
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
+            # 按需导入 imessage.py
+            import imessage
             self.imessage = imessage.IMessage()
         else:
             self.imessage = None
+
+        if self.config.useQPython3 == 'true':
+            try: # Android QPython3 验证
+                # 按需导入 qpython3.py
+                import qpython3
+                self.qpython3 = qpython3.QPython3()
+            except ModuleNotFoundError:
+                self.qpython3 = None
+        else:
+            self.qpython3 = None
 
     def is_login(self):
 
@@ -143,7 +161,8 @@ class Guahao(object):
         登陆
         """
         try:
-            cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
+            # patch for qpython3
+            cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
             self.browser.load_cookies(cookies_file)
             if self.is_login():
                 logging.info("cookies登录成功")
@@ -166,7 +185,8 @@ class Guahao(object):
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
-                cookies_file = os.path.join("." + self.config.mobile_no + ".cookies")
+                # patch for qpython3
+                cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
                 logging.info("登陆成功")
                 return True
@@ -339,10 +359,12 @@ class Guahao(object):
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
             logging.info("获取验证码成功")
-            if self.imessage is None:
-                code = input("输入短信验证码: ")
-            else:
+            if self.imessage is not None: # 如果使用 iMessage
                 code = self.imessage.get_verify_code()
+            elif self.qpython3 is not None: # 如果使用 QPython3
+                code = self.qpython3.get_verify_code()
+            else:
+                code = input("输入短信验证码: ")
             return code
         elif data["msg"] == "短信发送太频繁" and data["code"] == 812:
             logging.error(data["msg"])

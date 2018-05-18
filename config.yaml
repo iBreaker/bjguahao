@@ -40,3 +40,6 @@ DebugLevel: "info"
 
 #使用ios短信和mac电脑接收验证码
 useIMessage: "false"
+
+# 是否使用 QPython3.6 运行本脚本
+useQPython3: "true"
