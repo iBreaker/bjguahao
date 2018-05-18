@@ -119,6 +119,8 @@ useQPython3: "false"
 
 感谢 [yiqian987](https://github.com/yiqian987) 修改 [issues#27](https://github.com/iBreaker/bjguahao/issues/27)
 
+感谢 [coeusite](https://github.com/coeusite) 支持android挂号 [pull#56](https://github.com/iBreaker/bjguahao/pull/56)
+
 若遗漏了您，请发邮件通知我 <791628659@qq.com>
 
 ## 协议
