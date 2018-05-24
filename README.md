@@ -82,7 +82,7 @@ patientName: "曹操"
 # doctorName: 医生姓名
 # 不填写的话默认选最好的医生
 # 填写后若这个医生没有号，会自动选其余号中最好的医生
-doctorName: "扁鹊"
+doctorName: "华佗"
 
 # DebugLevel: 调试等级
 # 支持的调试等级有 debug/info/warning/error/critical
