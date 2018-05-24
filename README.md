@@ -38,6 +38,12 @@ Copyright (C) 2017
 6. 将整个项目复制到你的 Android
 7. 在 QPython3 中运行```qpython3_run.py```
 
+**Windows 环境使用方法**
+1.新增了windows版本的exe文件
+2.把配置文件放在exe文件同目录
+3.修改配置文件
+4.双击exe开始挂号
+
 *备注：*
 - 若配置文件不在项目目录，也可修改```qpython3_run.py```中的```config_path```为配置文件的**绝对**地址
 - 如需以项目的形式直接运行脚本，可以将```qpython3_run.py```改名为```main.py```，并将文件夹放置在```qpython/projects3/```下
@@ -82,7 +88,7 @@ patientName: "曹操"
 # doctorName: 医生姓名
 # 不填写的话默认选最好的医生
 # 填写后若这个医生没有号，会自动选其余号中最好的医生
-doctorName: "扁鹊"
+doctorName: "华佗"
 
 # DebugLevel: 调试等级
 # 支持的调试等级有 debug/info/warning/error/critical
