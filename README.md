@@ -38,16 +38,18 @@ Copyright (C) 2017
 6. 将整个项目复制到你的 Android
 7. 在 QPython3 中运行```qpython3_run.py```
 
+*备注：*
+- 若配置文件不在项目目录，也可修改```qpython3_run.py```中的```config_path```为配置文件的**绝对**地址
+- 如需以项目的形式直接运行脚本，可以将```qpython3_run.py```改名为```main.py```，并将文件夹放置在```qpython/projects3/```下
+- 也可将文件夹放置在```qpython/scripts3/```下，而后为```qpython3_run.py```建立桌面快捷方式。
+
+
 **Windows 环境使用方法**
 1. 新增了windows版本的exe文件
 2. 把配置文件放在exe文件同目录
 3. 修改配置文件
 4. 双击exe开始挂号，成功后程序自动退出
 
-*备注：*
-- 若配置文件不在项目目录，也可修改```qpython3_run.py```中的```config_path```为配置文件的**绝对**地址
-- 如需以项目的形式直接运行脚本，可以将```qpython3_run.py```改名为```main.py```，并将文件夹放置在```qpython/projects3/```下
-- 也可将文件夹放置在```qpython/scripts3/```下，而后为```qpython3_run.py```建立桌面快捷方式。
 
 ## 配置文件
 
