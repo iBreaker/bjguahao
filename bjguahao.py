@@ -12,6 +12,7 @@ import time
 import datetime
 import logging
 from lib.prettytable import PrettyTable
+import base64
 
 if sys.version_info.major != 3:
     logging.error("请在python3环境下运行本程序")
@@ -175,8 +176,8 @@ class Guahao(object):
         password = self.config.password
         mobile_no = self.config.mobile_no
         payload = {
-            'mobileNo': mobile_no,
-            'password': password,
+            'mobileNo': base64.b64encode(mobile_no.encode()),
+            'password': base64.b64encode(password.encode()),
             'yzm': '',
             'isAjax': True,
         }
