@@ -129,6 +129,8 @@ useQPython3: "false"
 
 感谢 [coeusite](https://github.com/coeusite) 支持android挂号 [pull#56](https://github.com/iBreaker/bjguahao/pull/56)
 
+感谢 [cuteapi](https://github.com/cuteapi) 添加 iphone mac 验证码自动获取的功能，抢号神器哦
+
 若遗漏了您，请发邮件通知我 <791628659@qq.com>
 
 ## 协议
