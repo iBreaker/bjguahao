@@ -11,6 +11,7 @@ import json
 import time
 import datetime
 import logging
+import base64
 from lib.prettytable import PrettyTable
 
 if sys.version_info.major != 3:
@@ -54,8 +55,9 @@ class Config(object):
                                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                                     datefmt='%a, %d %b %Y %H:%M:%S')
 
-                self.mobile_no = data["username"]
-                self.password = data["password"]
+                self.mobile_no = bytes(data["username"], encoding="utf-8")
+                self.password = bytes(data["password"], encoding="utf-8")
+                print(type(self.password))
                 self.date = data["date"]
                 self.hospital_id = data["hospitalId"]
                 self.department_id = data["departmentId"]
@@ -73,7 +75,7 @@ class Config(object):
                     self.useQPython3 = "false"
                 #
                 logging.info("配置加载完成")
-                logging.debug("手机号:" + str(self.mobile_no))
+                logging.debug("手机号:" + bytes.decode(self.mobile_no))
                 logging.debug("挂号日期:" + str(self.date))
                 logging.debug("医院id:" + str(self.hospital_id))
                 logging.debug("科室id:" + str(self.department_id))
@@ -162,7 +164,7 @@ class Guahao(object):
         """
         try:
             # patch for qpython3
-            cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
+            cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + bytes.decode(self.config.mobile_no) + ".cookies")
             self.browser.load_cookies(cookies_file)
             if self.is_login():
                 logging.info("cookies登录成功")
@@ -175,18 +177,19 @@ class Guahao(object):
         password = self.config.password
         mobile_no = self.config.mobile_no
         payload = {
-            'mobileNo': mobile_no,
-            'password': password,
+            'mobileNo': base64.b64encode(mobile_no),
+            'password': base64.b64encode(password),
             'yzm': '',
             'isAjax': True,
         }
+        logging.debug(payload)
         response = self.browser.post(self.login_url, data=payload)
         logging.debug("response data:" + response.text)
         try:
             data = json.loads(response.text)
             if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
                 # patch for qpython3
-                cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
+                cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + bytes.decode(self.config.mobile_no) + ".cookies")
                 self.browser.save_cookies(cookies_file)
                 logging.info("登陆成功")
                 return True
