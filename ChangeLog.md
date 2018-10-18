@@ -1,3 +1,15 @@
+## bjguahao 1.0.2
+* realse date: 2018-10-18
+* 优化挂号逻辑
+* 支持安卓挂号
+* 修改网站验证方式改变导致的登录不上的问题
+
+
+## bjguahao 1.0.1
+* realse date: 2018-03-01
+* 添加requirements.txt文件
+* 支持iphone - MAC验证码自动获取
+
 ## bjguahao 1.0.0
 * realse date: 2018-01-01
 * 从python2环境迁移到python3
