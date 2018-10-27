@@ -29,6 +29,17 @@ dutyCode: "1"
 # 若是自己挂号可为空
 patientName: "曹操"
 
+# 就诊卡号
+hospitalCardId: ""
+
+# 医保卡号
+medicareCardId: ""
+
+# 保险类型
+# 1:医保
+# 10:自费
+reimbursementType: "10"
+
 # doctorName: 医生姓名
 # 不填写的话默认选最好的医生
 # 填写后若这个医生没有号，会自动选其余号中最好的医生

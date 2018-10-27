@@ -62,6 +62,9 @@ class Config(object):
                 self.department_id = data["departmentId"]
                 self.duty_code = data["dutyCode"]
                 self.patient_name = data["patientName"]
+                self.hospital_card_id = data["hospitalCardId"]
+                self.medicare_card_id = data["medicareCardId"]
+                self.reimbursement_type = data["reimbursementType"]
                 self.doctorName = data["doctorName"]
                 self.patient_id = int()
                 try:
@@ -106,7 +109,7 @@ class Guahao(object):
         self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
         self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
         self.get_doctor_url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
-        self.confirm_url = "http://www.bjguahao.gov.cn/order/confirm.htm"
+        self.confirm_url = "http://www.bjguahao.gov.cn/order/confirmV1.htm"
         self.patient_id_url = "http://www.bjguahao.gov.cn/order/confirm/"
         self.department_url = "http://www.bjguahao.gov.cn/dpt/appoint/"
 
@@ -264,6 +267,9 @@ class Guahao(object):
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         patient_id = self.config.patient_id
+        hospital_card_id = self.config.hospital_card_id
+        medicare_card_id = self.config.medicare_card_id
+        reimbursement_type = self.config.reimbursement_type
         doctor_id = str(doctor['doctorId'])
 
         payload = {
@@ -272,9 +278,9 @@ class Guahao(object):
             'departmentId': department_id,
             'doctorId': doctor_id,
             'patientId': patient_id,
-            'hospitalCardId': "",
-            'medicareCardId': "",
-            "reimbursementType": "10",          # 报销类型
+            'hospitalCardId': hospital_card_id,
+            'medicareCardId': medicare_card_id,
+            "reimbursementType": reimbursement_type, # 报销类型
             'smsVerifyCode': sms_code,          # TODO 获取验证码
             'childrenBirthday': "",
             'isAjax': True
