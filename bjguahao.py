@@ -290,7 +290,7 @@ class Guahao(object):
 
         try:
             data = json.loads(response.text)
-            if data["msg"] == "成功" and not data["hasError"] and data["code"] == 1:
+            if data["msg"] == "成功" and data["code"] == 1:
                 #20181027,成功result：
                 #{"msg":"成功","code":1,"orderId":"97465746","isLineUp":false}
                 logging.info("挂号成功")
