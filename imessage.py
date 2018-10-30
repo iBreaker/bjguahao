@@ -67,7 +67,9 @@ class IMessage(object):
                 res = self.regex.search(text)
                 if res is None:
                     continue
-                rec_time = datetime.datetime.fromtimestamp(tm / 1e9 + OSX_EPOCH)
+                #osx 10.11.6，直接相加即可得正确时间。
+                rec_time = datetime.datetime.fromtimestamp(tm  + OSX_EPOCH)
+                #print('find msg: rec_time=', rec_time)
                 if rec_time < now:
                     continue
                 code = res.group(1).strip()
