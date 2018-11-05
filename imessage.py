@@ -7,7 +7,6 @@ import re
 import time
 import kbhit
 import sys
-import platform
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 from concurrent.futures import FIRST_COMPLETED
@@ -69,8 +68,8 @@ class IMessage(object):
                 if res is None:
                     continue
                 #osx 10.11.6，直接相加即可得正确时间。
-                uname = platform.uname()
-                if uname in ['18.2.0']:
+                #判断若时间大于2099年则任务时间需除1e9处理
+                if tm > 4070880000:
                     rec_time = datetime.datetime.fromtimestamp(tm/1e9  + OSX_EPOCH)
                 else:
                     rec_time = datetime.datetime.fromtimestamp(tm  + OSX_EPOCH)
