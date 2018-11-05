@@ -7,6 +7,7 @@ import re
 import time
 import kbhit
 import sys
+import platform
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import wait
 from concurrent.futures import FIRST_COMPLETED
@@ -68,7 +69,11 @@ class IMessage(object):
                 if res is None:
                     continue
                 #osx 10.11.6，直接相加即可得正确时间。
-                rec_time = datetime.datetime.fromtimestamp(tm  + OSX_EPOCH)
+                uname = platform.uname()
+                if uname in ['18.2.0']:
+                    rec_time = datetime.datetime.fromtimestamp(tm/1e9  + OSX_EPOCH)
+                else:
+                    rec_time = datetime.datetime.fromtimestamp(tm  + OSX_EPOCH)
                 #print('find msg: rec_time=', rec_time)
                 if rec_time < now:
                     continue
