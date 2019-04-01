@@ -66,6 +66,12 @@ class Config(object):
                 self.medicare_card_id = data["medicareCardId"]
                 self.reimbursement_type = data["reimbursementType"]
                 self.doctorName = data["doctorName"]
+                self.children_name = data["childrenName"]
+                self.children_idno = data["childrenIdNo"]
+                self.cid_type = data["cidType"]
+                self.children_gender = data["childrenGender"]
+                self.children_birthday = data["childrenBirthday"]
+                self.children = data["children"]
                 self.chooseBest = {"yes": True, "no": False}[data["chooseBest"]]
                 self.patient_id = int()
                 try:
@@ -76,6 +82,10 @@ class Config(object):
                     self.useQPython3 = data["useQPython3"]
                 except KeyError:
                     self.useQPython3 = "false"
+                try:
+                    self.children = data["children"]
+                except KeyError:
+                    self.children = "false"
                 #
                 logging.info("配置加载完成")
                 logging.debug("手机号:" + str(self.mobile_no))
@@ -85,6 +95,12 @@ class Config(object):
                 logging.debug("上午/下午:" + str(self.duty_code))
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
+                logging.debug("是否挂儿童号:" + str(self.children))
+                logging.debug("患儿姓名:" + str(self.children_name))
+                logging.debug("患儿证件号" + str(self.children_idno))
+                logging.debug("患儿证件类型:" + str(self.cid_type))
+                logging.debug("患儿性别:" + str(self.children_gender))
+                logging.debug("患儿生日:" + str(self.children_birthday))
                 logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
                 logging.debug("是否使用 QPython3 运行本脚本:" + str(self.useQPython3))
 
@@ -107,12 +123,12 @@ class Guahao(object):
         self.dutys = ""
         self.refresh_time = ''
 
-        self.login_url = "http://www.bjguahao.gov.cn/quicklogin.htm"
-        self.send_code_url = "http://www.bjguahao.gov.cn/v/sendorder.htm"
-        self.get_doctor_url = "http://www.bjguahao.gov.cn/dpt/partduty.htm"
-        self.confirm_url = "http://www.bjguahao.gov.cn/order/confirmV1.htm"
-        self.patient_id_url = "http://www.bjguahao.gov.cn/order/confirm/"
-        self.department_url = "http://www.bjguahao.gov.cn/dpt/appoint/"
+        self.login_url = "http://www.114yygh.com/quicklogin.htm"
+        self.send_code_url = "http://www.114yygh.com/v/sendorder.htm"
+        self.get_doctor_url = "http://www.114yygh.com/dpt/partduty.htm"
+        self.confirm_url = "http://www.114yygh.com/order/confirmV1.htm"
+        self.patient_id_url = "http://www.114yygh.com/order/confirm/"
+        self.department_url = "http://www.114yygh.com/dpt/appoint/"
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
@@ -279,21 +295,67 @@ class Guahao(object):
         medicare_card_id = self.config.medicare_card_id
         reimbursement_type = self.config.reimbursement_type
         doctor_id = str(doctor['doctorId'])
+        if self.config.children == 'true' and self.config.cid_type == "1":
+            cid_type = self.config.cid_type
+            children_name = self.config.children_name
+            children_idno = self.config.children_idno
 
-        payload = {
-            'dutySourceId': duty_source_id,
-            'hospitalId': hospital_id,
-            'departmentId': department_id,
-            'doctorId': doctor_id,
-            'patientId': patient_id,
-            'hospitalCardId': hospital_card_id,
-            'medicareCardId': medicare_card_id,
-            "reimbursementType": reimbursement_type, # 报销类型
-            'smsVerifyCode': sms_code,          # TODO 获取验证码
-            'childrenBirthday': "",
-            'isAjax': True
-        }
+            payload = {
+                'dutySourceId': duty_source_id,
+                'hospitalId': hospital_id,
+                'departmentId': department_id,
+                'doctorId': doctor_id,
+                'patientId': patient_id,
+                'hospitalCardId': hospital_card_id,
+                'medicareCardId': medicare_card_id,
+                "reimbursementType": reimbursement_type,  # 报销类型
+                'smsVerifyCode': sms_code,  # TODO 获取验证码
+                'childrenName': children_name,
+                'childrenIdNo': children_idno,
+                'cidType': cid_type,
+                # 'childrenBirthday': "",
+                'isAjax': True
+            }
+        elif self.config.children == 'true' and self.config.cid_type == "2":
+            cid_type = self.config.cid_type
+            children_name = self.config.children_name
+            children_idno = self.config.children_idno
+            children_gender = self.config.children_gender
+            children_birthday = self.config.children_birthday
+
+            payload = {
+                'dutySourceId': duty_source_id,
+                'hospitalId': hospital_id,
+                'departmentId': department_id,
+                'doctorId': doctor_id,
+                'patientId': patient_id,
+                'hospitalCardId': hospital_card_id,
+                'medicareCardId': medicare_card_id,
+                "reimbursementType": reimbursement_type,  # 报销类型
+                'smsVerifyCode': sms_code,  # TODO 获取验证码
+                'childrenName': children_name,
+                'childrenIdNo': children_idno,
+                'cidType': cid_type,
+                'childrenGender': children_gender,
+                'childrenBirthday': children_birthday,
+                'isAjax': True
+            }
+        else:
+            payload = {
+                'dutySourceId': duty_source_id,
+                'hospitalId': hospital_id,
+                'departmentId': department_id,
+                'doctorId': doctor_id,
+                'patientId': patient_id,
+                'hospitalCardId': hospital_card_id,
+                'medicareCardId': medicare_card_id,
+                "reimbursementType": reimbursement_type, # 报销类型
+                'smsVerifyCode': sms_code,          # TODO 获取验证码
+                'childrenBirthday': "",
+                'isAjax': True
+            }
         response = self.browser.post(self.confirm_url, data=payload)
+        logging.debug("payload:" + json.dumps(payload))
         logging.debug("response data:" + response.text)
 
         try:

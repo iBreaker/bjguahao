@@ -1,3 +1,15 @@
+## bjguahao 1.0.4
+* realse date: 2019-04-01
+* 支持儿研所挂号，其他儿童号自测
+* 更新域名为114yygh.com
+* 配置文件增加相关儿童挂号参数
+
+
+## bjguahao 1.0.3
+* realse date: 2018-11-05
+* issue64修复
+
+
 ## bjguahao 1.0.2
 * realse date: 2018-10-18
 * 优化挂号逻辑

@@ -92,10 +92,35 @@ patientName: "曹操"
 # 填写后若这个医生没有号，会自动选其余号中最好的医生
 doctorName: "华佗"
 
+#挂号类型是否为儿童号
+children: "false"
+
+#患儿名字 如果儿童挂号必须填写
+childrenName: ""
+
+#患儿证件号 如果儿童挂号必须填写
+childrenIdNo: ""
+
+#患儿证件
+#1:身份证
+#2:其他
+cidType: "1"
+
+#如果证件选择其他以下为必填否则不填
+#患儿性别
+#1:男
+#2:女
+childrenGender: ""
+
+#患儿生日
+#例：2018-01-01
+childrenBirthday: ""
+
 # chooseBest: 选择模式
 # 不填写的默认从最好的医生开始选择
 # 可选项为"yes" 或者 "no"
 chooseBest: "yes"
+
 
 # DebugLevel: 调试等级
 # 支持的调试等级有 debug/info/warning/error/critical
