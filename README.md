@@ -116,6 +116,12 @@ childrenGender: ""
 #例：2018-01-01
 childrenBirthday: ""
 
+# chooseBest: 选择模式
+# 不填写的默认从最好的医生开始选择
+# 可选项为"yes" 或者 "no"
+chooseBest: "yes"
+
+
 # DebugLevel: 调试等级
 # 支持的调试等级有 debug/info/warning/error/critical
 DebugLevel: "info"

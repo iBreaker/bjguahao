@@ -72,6 +72,7 @@ class Config(object):
                 self.children_gender = data["childrenGender"]
                 self.children_birthday = data["childrenBirthday"]
                 self.children = data["children"]
+                self.chooseBest = {"yes": True, "no": False}[data["chooseBest"]]
                 self.patient_id = int()
                 try:
                     self.useIMessage = data["useIMessage"]
@@ -254,14 +255,21 @@ class Guahao(object):
 
         self.print_doctor()
 
-        for doctor in self.dutys[::-1]:
+        if self.chooseBest:
+            doctors = self.dutys[::-1]
+        else:
+            doctors = self.dutys
+
+        for doctor in doctors:
             if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
                 logging.info("选中:" + str(doctor["doctorName"]))
                 return doctor
-        for doctor in self.dutys[::-1]:
+
+        for doctor in doctors:
             if doctor['remainAvailableNumber']:
                 logging.info("选中:" + str(doctor["doctorName"]))
                 return doctor
+
         return "NoDuty"
 
     def print_doctor(self):
