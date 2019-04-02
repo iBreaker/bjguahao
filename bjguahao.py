@@ -255,7 +255,7 @@ class Guahao(object):
 
         self.print_doctor()
 
-        if self.chooseBest:
+        if self.config.chooseBest:
             doctors = self.dutys[::-1]
         else:
             doctors = self.dutys
