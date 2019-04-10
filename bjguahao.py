@@ -295,28 +295,7 @@ class Guahao(object):
         medicare_card_id = self.config.medicare_card_id
         reimbursement_type = self.config.reimbursement_type
         doctor_id = str(doctor['doctorId'])
-        if self.config.children == 'true' and self.config.cid_type == "1":
-            cid_type = self.config.cid_type
-            children_name = self.config.children_name
-            children_idno = self.config.children_idno
-
-            payload = {
-                'dutySourceId': duty_source_id,
-                'hospitalId': hospital_id,
-                'departmentId': department_id,
-                'doctorId': doctor_id,
-                'patientId': patient_id,
-                'hospitalCardId': hospital_card_id,
-                'medicareCardId': medicare_card_id,
-                "reimbursementType": reimbursement_type,  # 报销类型
-                'smsVerifyCode': sms_code,  # TODO 获取验证码
-                'childrenName': children_name,
-                'childrenIdNo': children_idno,
-                'cidType': cid_type,
-                # 'childrenBirthday': "",
-                'isAjax': True
-            }
-        elif self.config.children == 'true' and self.config.cid_type == "2":
+        if self.config.children == 'true':
             cid_type = self.config.cid_type
             children_name = self.config.children_name
             children_idno = self.config.children_idno
