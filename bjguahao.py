@@ -25,6 +25,7 @@ except ModuleNotFoundError as e:
     sys.exit(-1)
 
 from browser import Browser
+from idcard_information import GetInformation
 
 try:
     import yaml
@@ -69,8 +70,6 @@ class Config(object):
                 self.children_name = data["childrenName"]
                 self.children_idno = data["childrenIdNo"]
                 self.cid_type = data["cidType"]
-                self.children_gender = data["childrenGender"]
-                self.children_birthday = data["childrenBirthday"]
                 self.children = data["children"]
                 self.chooseBest = {"yes": True, "no": False}[data["chooseBest"]]
                 self.patient_id = int()
@@ -99,8 +98,8 @@ class Config(object):
                 logging.debug("患儿姓名:" + str(self.children_name))
                 logging.debug("患儿证件号" + str(self.children_idno))
                 logging.debug("患儿证件类型:" + str(self.cid_type))
-                logging.debug("患儿性别:" + str(self.children_gender))
-                logging.debug("患儿生日:" + str(self.children_birthday))
+                logging.debug("患儿性别:" + str(GetInformation(self.children_idno).get_sex()))
+                logging.debug("患儿生日:" + str(GetInformation(self.children_idno).get_birthday()))
                 logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
                 logging.debug("是否使用 QPython3 运行本脚本:" + str(self.useQPython3))
 
@@ -299,8 +298,8 @@ class Guahao(object):
             cid_type = self.config.cid_type
             children_name = self.config.children_name
             children_idno = self.config.children_idno
-            children_gender = self.config.children_gender
-            children_birthday = self.config.children_birthday
+            children_gender = GetInformation(children_idno).get_sex()
+            children_birthday = GetInformation(children_idno).get_birthday()
 
             payload = {
                 'dutySourceId': duty_source_id,
