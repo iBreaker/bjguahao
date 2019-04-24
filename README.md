@@ -106,15 +106,6 @@ childrenIdNo: ""
 #2:其他
 cidType: "1"
 
-#患儿性别 如果儿童挂号必须填写
-#1:男
-#2:女
-childrenGender: ""
-
-#患儿生日 如果儿童挂号必须填写
-#例：2018-01-01
-childrenBirthday: ""
-
 # chooseBest: 选择模式
 # 不填写的默认从最好的医生开始选择
 # 可选项为"yes" 或者 "no"
