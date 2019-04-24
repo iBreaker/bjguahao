@@ -95,11 +95,12 @@ class Config(object):
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
                 logging.debug("是否挂儿童号:" + str(self.children))
-                logging.debug("患儿姓名:" + str(self.children_name))
-                logging.debug("患儿证件号" + str(self.children_idno))
-                logging.debug("患儿证件类型:" + str(self.cid_type))
-                logging.debug("患儿性别:" + str(GetInformation(self.children_idno).get_sex()))
-                logging.debug("患儿生日:" + str(GetInformation(self.children_idno).get_birthday()))
+                if self.children == "true":
+                    logging.debug("患儿姓名:" + str(self.children_name))
+                    logging.debug("患儿证件号" + str(self.children_idno))
+                    logging.debug("患儿证件类型:" + str(self.cid_type))
+                    logging.debug("患儿性别:" + str(GetInformation(self.children_idno).get_sex()))
+                    logging.debug("患儿生日:" + str(GetInformation(self.children_idno).get_birthday()))
                 logging.debug("使用mac电脑接收验证码:" + str(self.useIMessage))
                 logging.debug("是否使用 QPython3 运行本脚本:" + str(self.useQPython3))
 
