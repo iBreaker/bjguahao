@@ -373,7 +373,8 @@ class Guahao(object):
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
-        m = re.search(u'<input type=\\"radio\\" name=\\"hzr\\" value=\\"(?P<patientId>\d+)\\"[^>]*> ' + self.config.patient_name, ret)
+        m = re.search(u'name="(?P<patientId>\d+)"><div class="imgShow"></div><div class="infoRight"><span class="name">' + self.config.patient_name, ret)
+
         if m is None:
             sys.exit("获取患者id失败")
         else:
@@ -391,7 +392,6 @@ class Guahao(object):
         addr = self.gen_department_url()
         response = self.browser.get(addr, "")
         ret = response.text
-
         # 放号时间
         m = re.search('<span>更新时间：</span>每日(?P<refreshTime>\d{1,2}:\d{2})更新', ret)
         refresh_time = m.group('refreshTime')
