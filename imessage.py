@@ -85,9 +85,9 @@ class IMessage(object):
 
     def get_verify_code(self):
         self.done = False
-        keyboard = self.pool.submit(self._get_keyboard_verify_code)
+        # keyboard = self.pool.submit(self._get_keyboard_verify_code)
         sms = self.pool.submit(self._get_sms_verify_code)
-        done, not_done = wait([sms, keyboard], timeout=30, return_when=FIRST_COMPLETED)
+        done, not_done = wait([sms], timeout=30, return_when=FIRST_COMPLETED)
         self.done = True
         code = '000000'
         for ft in done:
