@@ -90,7 +90,10 @@ patientName: "曹操"
 # doctorName: 医生姓名
 # 不填写的话默认选最好的医生
 # 填写后若这个医生没有号，会自动选其余号中最好的医生
-doctorName: "华佗"
+doctorName:
+  - "扁鹊"
+  - "华佗"
+  - "杨永信"
 
 #挂号类型是否为儿童号
 children: "false"

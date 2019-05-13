@@ -260,11 +260,13 @@ class Guahao(object):
         else:
             doctors = self.dutys
 
-        for doctor in doctors:
-            if doctor["doctorName"] == self.config.doctorName and doctor['remainAvailableNumber']:
-                logging.info("选中:" + str(doctor["doctorName"]))
-                return doctor
+        # 按照配置优先级选择医生
+        for doctor_conf in self.config.doctorName:
+            for doctor in doctors:
+                if doctor["doctorName"] == doctor_conf and doctor['remainAvailableNumber']:
+                    return doctor
 
+        # 若没有合适的医生，默认返回最好的医生
         for doctor in doctors:
             if doctor['remainAvailableNumber']:
                 logging.info("选中:" + str(doctor["doctorName"]))
