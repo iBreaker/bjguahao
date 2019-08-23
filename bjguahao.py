@@ -13,6 +13,8 @@ import datetime
 import logging
 from lib.prettytable import PrettyTable
 import base64
+from Crypto.Cipher import AES
+
 
 if sys.version_info.major != 3:
     logging.error("请在python3环境下运行本程序")
@@ -73,6 +75,7 @@ class Config(object):
                 self.children = data["children"]
                 self.chooseBest = {"yes": True, "no": False}[data["chooseBest"]]
                 self.patient_id = int()
+                self.web_password = "hyde2019hyde2019"
                 try:
                     self.useIMessage = data["useIMessage"]
                 except KeyError:
@@ -112,6 +115,53 @@ class Config(object):
             logging.error(repr(e))
             sys.exit()
 
+class AES_encrypt():
+
+    def __init__(self, key, mode='ecb', iv=''):
+
+        self.key = key#.decode("hex")
+        self.iv = iv
+        self.cryptor = None
+        if mode == "ecb":
+            self.cryptor = AES.new(str.encode(self.key), AES.MODE_ECB)
+        elif mode == 'cbc':
+            self.cryptor = AES.new(str.encode(self.key), AES.MODE_CBC, self.iv)
+        else:
+            return "Error Mode"
+
+
+
+    def __pad(self, text):
+        """填充方式，PKCS7"""
+        text_length = len(text)
+        amount_to_pad = AES.block_size - (text_length % AES.block_size)
+        # if amount_to_pad == 0:
+        #     amount_to_pad = AES.block_size
+        padd = chr(amount_to_pad)
+        return text + padd * amount_to_pad
+
+    def __unpad(self, text):
+        padd = ord(text[-1])
+        return text[:-padd]
+
+    def encrypt(self, text):
+        text = self.__pad(text)
+        self.ciphertext = self.cryptor.encrypt(str.encode(text))
+
+        return base64.b64encode(self.ciphertext)
+
+    def decrypt(self, text):
+
+        plain_text = self.cryptor.decrypt(base64.b64decode(text))
+        return self.__unpad(plain_text)
+
+    def get_byte(self,str_in):
+        str_out = ""
+
+        for i in range(0, len(str_in), 2):
+            str_out = str_out+"0x%s" % str_in[i:i+2]+","
+        str_out = str_out[:-1]
+        return str_out
 
 class Guahao(object):
     """
@@ -123,8 +173,8 @@ class Guahao(object):
         self.dutys = ""
         self.refresh_time = ''
 
-        self.login_url = "http://www.114yygh.com/quicklogin.htm"
-        self.send_code_url = "http://www.114yygh.com/v/sendorder.htm"
+        self.login_url = "http://www.114yygh.com/web/login/doLogin.htm"
+        self.send_code_url = "http://www.114yygh.com/v/sendSmsCode.htm"
         self.get_doctor_url = "http://www.114yygh.com/dpt/partduty.htm"
         self.confirm_url = "http://www.114yygh.com/order/confirmV1.htm"
         self.patient_id_url = "http://www.114yygh.com/order/confirm/"
@@ -149,7 +199,6 @@ class Guahao(object):
             self.qpython3 = None
 
     def is_login(self):
-
         logging.info("开始检查是否已经登录")
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
@@ -163,7 +212,7 @@ class Guahao(object):
             'dutyDate': time.strftime("%Y-%m-%d"),
             'isAjax': True
         }
-
+        
         response = self.browser.post(self.get_doctor_url, data=payload)
         try:
             data = json.loads(response.text)
@@ -190,22 +239,26 @@ class Guahao(object):
                 return True
         except Exception as e:
             pass
+          
+        aes = AES_encrypt(self.config.web_password, 'ecb', '')
 
         logging.info("cookies登录失败")
         logging.info("开始使用账号密码登陆")
         password = self.config.password
         mobile_no = self.config.mobile_no
         payload = {
-            'mobileNo': base64.b64encode(mobile_no.encode()),
-            'password': base64.b64encode(password.encode()),
-            'yzm': '',
-            'isAjax': True,
+            'mobileNo': aes.encrypt(mobile_no),
+            'password': aes.encrypt(password),
+            'loginType': 'PASSWORD_LOGIN',
+            'isAjax': 'true',
+
         }
         response = self.browser.post(self.login_url, data=payload)
         logging.debug("response data:" + response.text)
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
+            if data['code'] == 0:#data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
+
                 # patch for qpython3
                 cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
@@ -235,7 +288,8 @@ class Guahao(object):
             'departmentId': department_id,
             'dutyCode': duty_code,
             'dutyDate': duty_date,
-            'isAjax': True
+            'isAjax': 'true'
+
         }
 
         response = self.browser.post(self.get_doctor_url, data=payload)
@@ -305,6 +359,7 @@ class Guahao(object):
             children_birthday = GetInformation(children_idno).get_birthday()
 
             payload = {
+                'phone':self.config.mobile_no,
                 'dutySourceId': duty_source_id,
                 'hospitalId': hospital_id,
                 'departmentId': department_id,
@@ -319,10 +374,11 @@ class Guahao(object):
                 'cidType': cid_type,
                 'childrenGender': children_gender,
                 'childrenBirthday': children_birthday,
-                'isAjax': True
+                'isAjax': 'true'
             }
         else:
             payload = {
+                'phone':self.config.mobile_no,
                 'dutySourceId': duty_source_id,
                 'hospitalId': hospital_id,
                 'departmentId': department_id,
@@ -333,7 +389,7 @@ class Guahao(object):
                 "reimbursementType": reimbursement_type, # 报销类型
                 'smsVerifyCode': sms_code,          # TODO 获取验证码
                 'childrenBirthday': "",
-                'isAjax': True
+                'isAjax': 'true'
             }
         response = self.browser.post(self.confirm_url, data=payload)
         logging.debug("payload:" + json.dumps(payload))
@@ -375,15 +431,15 @@ class Guahao(object):
         addr = self.gen_doctor_url(doctor)
         response = self.browser.get(addr, "")
         ret = response.text
-        m = re.search(u'name="(?P<patientId>\d+)"><div class="imgShow"></div><div class="infoRight"><span class="name">' + self.config.patient_name, ret)
 
+        m = re.search(u'name="(?P<patientId>\d+)" phone="\d*"><div class="imgShow"></div><div class="infoRight"><p class="name">*.' +self.config.patient_name[1:], ret)
         if m is None:
             sys.exit("获取患者id失败")
         else:
             self.config.patient_id = m.group('patientId')
             logging.info("病人ID:" + self.config.patient_id)
 
-            return self.config.patient_id
+        return self.config.patient_id
 
     def gen_department_url(self):
         return self.department_url + str(self.config.hospital_id) + \
@@ -411,7 +467,6 @@ class Guahao(object):
         if self.config.date == 'latest':
             self.config.date = self.stop_date.strftime("%Y-%m-%d")
             logging.info("当前挂号日期变更为: " + self.config.date)
-
         # 生成放号时间和程序开始时间
         con_data_str = self.config.date + " " + refresh_time + ":00"
         self.start_time = datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days= - int(appoint_day))
@@ -419,7 +474,12 @@ class Guahao(object):
 
     def get_sms_verify_code(self):
         """获取短信验证码"""
-        response = self.browser.post(self.send_code_url, "")
+        payload = {
+        "smsType":4,
+        "mobileNo":self.config.mobile_no,
+        "isAjax":"true"
+        }
+        response = self.browser.post(self.send_code_url, data=payload)
         data = json.loads(response.text)
         logging.debug(response.text)
         if data["msg"] == "OK." and data["code"] == 200:
@@ -480,6 +540,7 @@ class Guahao(object):
                 time.sleep(1)
             else:
                 sms_code = self.get_sms_verify_code()               # 获取验证码
+                print('sms_code:',sms_code)
                 if sms_code is None:
                     time.sleep(1)
 
