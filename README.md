@@ -154,6 +154,8 @@ useQPython3: "false"
 
 感谢 [cuteapi](https://github.com/cuteapi) 添加 iphone mac 验证码自动获取的功能，抢号神器哦
 
+感谢 [cxl008](https://github.com/cxl008) 更新登录已经获取验证码代码
+
 若遗漏了您，请发邮件通知我 <791628659@qq.com>
 
 ## 协议
