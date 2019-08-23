@@ -15,6 +15,7 @@ from lib.prettytable import PrettyTable
 import base64
 from Crypto.Cipher import AES
 
+
 if sys.version_info.major != 3:
     logging.error("请在python3环境下运行本程序")
     sys.exit(-1)
@@ -173,7 +174,7 @@ class Guahao(object):
         self.refresh_time = ''
 
         self.login_url = "http://www.114yygh.com/web/login/doLogin.htm"
-        self.send_code_url = "http://www.114yygh.com/v/sendSmsCode.htm.htm"
+        self.send_code_url = "http://www.114yygh.com/v/sendSmsCode.htm"
         self.get_doctor_url = "http://www.114yygh.com/dpt/partduty.htm"
         self.confirm_url = "http://www.114yygh.com/order/confirmV1.htm"
         self.patient_id_url = "http://www.114yygh.com/order/confirm/"
@@ -198,7 +199,6 @@ class Guahao(object):
             self.qpython3 = None
 
     def is_login(self):
-
         logging.info("开始检查是否已经登录")
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
@@ -212,7 +212,7 @@ class Guahao(object):
             'dutyDate': time.strftime("%Y-%m-%d"),
             'isAjax': True
         }
-
+        
         response = self.browser.post(self.get_doctor_url, data=payload)
         try:
             data = json.loads(response.text)
@@ -239,7 +239,9 @@ class Guahao(object):
                 return True
         except Exception as e:
             pass
+          
         aes = AES_encrypt(self.config.web_password, 'ecb', '')
+
         logging.info("cookies登录失败")
         logging.info("开始使用账号密码登陆")
         password = self.config.password
@@ -249,12 +251,14 @@ class Guahao(object):
             'password': aes.encrypt(password),
             'loginType': 'PASSWORD_LOGIN',
             'isAjax': 'true',
+
         }
         response = self.browser.post(self.login_url, data=payload)
         logging.debug("response data:" + response.text)
         try:
             data = json.loads(response.text)
             if data['code'] == 0:#data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
+
                 # patch for qpython3
                 cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
@@ -285,6 +289,7 @@ class Guahao(object):
             'dutyCode': duty_code,
             'dutyDate': duty_date,
             'isAjax': 'true'
+
         }
 
         response = self.browser.post(self.get_doctor_url, data=payload)
@@ -462,7 +467,6 @@ class Guahao(object):
         if self.config.date == 'latest':
             self.config.date = self.stop_date.strftime("%Y-%m-%d")
             logging.info("当前挂号日期变更为: " + self.config.date)
-
         # 生成放号时间和程序开始时间
         con_data_str = self.config.date + " " + refresh_time + ":00"
         self.start_time = datetime.datetime.strptime(con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days= - int(appoint_day))

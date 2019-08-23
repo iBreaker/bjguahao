@@ -87,3 +87,17 @@ hospitalId=270&departmentId=200003874&dutyCode=1&dutyDate=2017-03-13&isAjax=true
 ### 挂号
 
 ### 关于验证码
+目前支持*ios系统*的手机和*osx*系统的电脑自动填写验证码
+##### 配置自动填写验证码
+1. 在*osx*系统电脑上登录
+![](https://github.com/cuteapi/bjguahao/blob/add_doc/img/step1.jpg)
+![](https://github.com/cuteapi/bjguahao/blob/add_doc/img/step2.jpg)
+
+2. 在手机配置信息转发
+![](https://github.com/cuteapi/bjguahao/blob/add_doc/img/step3.png)
+![](https://github.com/cuteapi/bjguahao/blob/add_doc/img/step4.png)
+![](https://github.com/cuteapi/bjguahao/blob/add_doc/img/step5.PNG)
+
+3. 修改config.yaml设置useIMessage为true
+
+
