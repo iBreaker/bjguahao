@@ -163,3 +163,10 @@ useQPython3: "false"
 ![](https://www.gnu.org/graphics/gplv3-127x51.png)
 
 bjguahao 基于 GPL-3.0 协议进行分发和使用，更多信息参见协议文件。
+
+
+## Stargazers over time
+
+![Stargazers over time](https://starchart.cc/iBreaker/bjguahao.svg)
+
+
