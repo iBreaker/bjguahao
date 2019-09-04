@@ -73,6 +73,9 @@ class Config(object):
                 self.children_idno = data["childrenIdNo"]
                 self.cid_type = data["cidType"]
                 self.children = data["children"]
+                self.assign = data['assign']
+                self.remaining = data['remaining']
+                self.week = data['week']
                 self.chooseBest = {"yes": True, "no": False}[data["chooseBest"]]
                 self.patient_id = int()
                 self.web_password = "hyde2019hyde2019"
@@ -97,6 +100,9 @@ class Config(object):
                 logging.debug("上午/下午:" + str(self.duty_code))
                 logging.debug("就诊人姓名:" + str(self.patient_name))
                 logging.debug("所选医生:" + str(self.doctorName))
+                logging.debug("是否挂指定医生:"+str(self.assign))
+                logging.debug("检索每天余票:"+str(self.remaining))
+                logging.debug("检索周:"+str(self.week))
                 logging.debug("是否挂儿童号:" + str(self.children))
                 if self.children == "true":
                     logging.debug("患儿姓名:" + str(self.children_name))
@@ -176,9 +182,11 @@ class Guahao(object):
         self.login_url = "http://www.114yygh.com/web/login/doLogin.htm"
         self.send_code_url = "http://www.114yygh.com/v/sendSmsCode.htm"
         self.get_doctor_url = "http://www.114yygh.com/dpt/partduty.htm"
+        self.duty_url = "http://www.114yygh.com/dpt/build/duty.htm"
         self.confirm_url = "http://www.114yygh.com/order/confirmV1.htm"
         self.patient_id_url = "http://www.114yygh.com/order/confirm/"
         self.department_url = "http://www.114yygh.com/dpt/appoint/"
+        self.calendar = "http://www.114yygh.com/dpt/week/calendar.htm"
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
@@ -251,7 +259,6 @@ class Guahao(object):
             'password': aes.encrypt(password),
             'loginType': 'PASSWORD_LOGIN',
             'isAjax': 'true',
-
         }
         response = self.browser.post(self.login_url, data=payload)
         logging.debug("response data:" + response.text)
@@ -272,48 +279,93 @@ class Guahao(object):
             logging.error(e)
             logging.error("登陆失败")
             sys.exit(-1)
-
+    def calendar_vec(self):
+        param = {
+            "hospitalId": self.config.hospital_id,
+            "departmentId": self.config.department_id,
+            "departmentName": "",
+            "week": "1",
+            "isAjax": "true",
+            "relType": "0",
+            "sdFirstId":"0",
+            "sdSecondId": "0"
+            }
+        response = self.browser.post(self.calendar,param)
+        logging.debug("response data:" + response.text)
+        data = json.loads(response.text)
+        rt = []
+        if data['code'] == 1:
+            for duty in data['dutyCalendars']:
+                if duty['remainAvailableNumber']>=0 and duty['dutyWeek'] in self.config.week:
+                    rt.append(duty['dutyDate'])
+        logging.info('该科室可挂'+','.join(rt)+'号')
+        self.calendar_vec_param = rt
     def select_doctor(self):
+        if self.config.remaining == "true":
+            for duty_date in self.calendar_vec_param:
+                    logging.info("查询"+duty_date+"号源")
+                    doctor = self.select_doctor_one_day(duty_date)
+                    if doctor == 'NoDuty' or doctor == 'NotReady' :
+                        time.sleep(3)
+                        continue
+                    else:
+                        return doctor
+            return 'NoDuty'
+        else:
+            doctor = self.select_doctor_one_day(self.config.date)
+            return doctor
+ 
+    def select_doctor_one_day(self,duty_date):
         """选择合适的大夫"""
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         duty_code = self.config.duty_code
-        duty_date = self.config.date
-
         # log current date
         logging.debug("当前挂号日期: " + self.config.date)
 
         payload = {
             'hospitalId': hospital_id,
             'departmentId': department_id,
-            'dutyCode': duty_code,
             'dutyDate': duty_date,
             'isAjax': 'true'
-
         }
-
-        response = self.browser.post(self.get_doctor_url, data=payload)
+        response = self.browser.post(self.duty_url, data=payload)
         logging.debug("response data:" + response.text)
-
         try:
             data = json.loads(response.text)
-            if data["msg"] == "OK" and not data["hasError"] and data["code"] == 200:
-                self.dutys = data["data"]
-
+            if not data["hasError"] and data["code"] == 1:
+                dutys =[]
+                if self.config.duty_code == '1': #上午
+                    dutys = ['1']
+                elif self.config.duty_code == '2': #下午
+                    dutys = ['2']
+                else: #全天
+                    dutys = ['1','2']
+                for duty in dutys:
+                    self.dutys = data['data'][duty]
+                    doctor = self.select_doctor_by_vec()
+                    if doctor == 'NoDuty' or doctor == 'NotReady' :
+                        continue
+                    return doctor
+                return 'NoDuty'
         except Exception as e:
             logging.error(repr(e))
             sys.exit()
-
+    def select_doctor_by_vec(self):
         if len(self.dutys) == 0:
             return "NotReady"
-
         self.print_doctor()
-
         if self.config.chooseBest:
             doctors = self.dutys[::-1]
         else:
             doctors = self.dutys
-
+        if self.config.assign == 'true':
+            for doctor_conf in self.config.doctorName:
+                for doctor in doctors:
+                    if doctor["doctorName"] == doctor_conf and (doctor['remainAvailableNumber']):
+                        logging.info("选中:" + str(doctor["doctorName"]))
+                        return doctor
+            return "NoDuty"
         # 按照配置优先级选择医生
         for doctor_conf in self.config.doctorName:
             for doctor in doctors:
@@ -325,11 +377,9 @@ class Guahao(object):
             if doctor['remainAvailableNumber']:
                 logging.info("选中:" + str(doctor["doctorName"]))
                 return doctor
-
         return "NoDuty"
 
     def print_doctor(self):
-
         logging.info("当前号余量:")
         x = PrettyTable()
         x.border = True
@@ -519,6 +569,7 @@ class Guahao(object):
         self.get_duty_time()
         self.auth_login()                       # 1. 登陆
         self.lazy()
+        self.calendar_vec()
         doctor = ""
         while True:
             doctor = self.select_doctor()       # 2. 选择医生
@@ -527,8 +578,8 @@ class Guahao(object):
                 # 如果当前时间 > 放号时间 + 30s
                 if self.start_time + datetime.timedelta(seconds=30) < datetime.datetime.now():
                     # 确认无号，终止程序
-                    logging.error("没号了,  亲~")
-                    break
+                    logging.info("没号了,亲~,休息一下继续刷")
+                    time.sleep(1)
                 else:
                     # 未到时间，强制重试
                     logging.debug("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
