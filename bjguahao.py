@@ -228,7 +228,7 @@ class Guahao(object):
 
     def auth_login(self):
         """
-        登陆
+        登录
         """
         try:
             # patch for qpython3
@@ -243,7 +243,7 @@ class Guahao(object):
         aes = AES_encrypt(self.config.web_password, 'ecb', '')
 
         logging.info("cookies登录失败")
-        logging.info("开始使用账号密码登陆")
+        logging.info("开始使用账号密码登录")
         password = self.config.password
         mobile_no = self.config.mobile_no
         payload = {
@@ -262,7 +262,7 @@ class Guahao(object):
                 # patch for qpython3
                 cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
-                logging.info("登陆成功")
+                logging.info("登录成功")
                 return True
             else:
                 logging.error(data["msg"])
@@ -270,7 +270,7 @@ class Guahao(object):
 
         except Exception as e:
             logging.error(e)
-            logging.error("登陆失败")
+            logging.error("登录失败")
             sys.exit(-1)
 
     def select_doctor(self):
@@ -517,7 +517,7 @@ class Guahao(object):
     def run(self):
         """主逻辑"""
         self.get_duty_time()
-        self.auth_login()                       # 1. 登陆
+        self.auth_login()                       # 1. 登录
         self.lazy()
         doctor = ""
         while True:
