@@ -1,3 +1,4 @@
 requests>=2.20.0
 pyyaml>=4.2b1
 pycryptodome>=3.8.2
+tqdm>=4.7.0
