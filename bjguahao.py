@@ -457,7 +457,7 @@ class Guahao(object):
 
     def get_patient_id(self):
         """获取就诊人Id"""
-        response = self.browser.get(order_patient_list+"?rd="+str(self.timestamp()), "")
+        response = self.browser.get(self.order_patient_list+"?rd="+str(self.timestamp()), "")
         ret = response.text
         data = json.loads(ret)
         if data['resCode'] != 0:
@@ -468,7 +468,7 @@ class Guahao(object):
                 if patient['name'][1:] in self.config.patient_name:
                     self.config.patient_id = patient['id']
                     break
-            logging.info("病人ID:" + self.config.patient_id)
+            logging.info("病人ID:" + str(self.config.patient_id))
         return self.config.patient_id
 
     def gen_department_url(self):
