@@ -14,6 +14,7 @@ import logging
 from lib.prettytable import PrettyTable
 import base64
 from Crypto.Cipher import AES
+from tqdm import tqdm, trange
 
 
 if sys.version_info.major != 3:
@@ -225,7 +226,7 @@ class Guahao(object):
 
     def auth_login(self):
         """
-        登陆
+        登录
         """
         try:
             # patch for qpython3
@@ -239,10 +240,12 @@ class Guahao(object):
           
         aes = AES_encrypt(self.config.web_password, 'ecb', '')
         logging.info("cookies登录失败")
-        logging.info("开始使用账号密码登陆")
+
+        logging.info("开始使用账号密码登录")
         self.browser.get(self.verify_url+"?mobile="+self.config.mobile_no+"&rd="+str(self.timestamp()),"")
         sms_code = self.get_sms_verify_code("LOGIN")
         time.sleep(1)
+
         mobile_no = self.config.mobile_no
         payload = {
             'loginType': 'SMS_CODE_LOGIN',
@@ -257,7 +260,7 @@ class Guahao(object):
                 # patch for qpython3
                 cookies_file = os.path.join(os.path.dirname(sys.argv[0]), "." + self.config.mobile_no + ".cookies")
                 self.browser.save_cookies(cookies_file)
-                logging.info("登陆成功")
+                logging.info("登录成功")
                 return True
             else:
                 logging.error(data["msg"])
@@ -265,7 +268,7 @@ class Guahao(object):
 
         except Exception as e:
             logging.error(e)
-            logging.error("登陆失败")
+            logging.error("登录失败")
             sys.exit(-1)
     def calendar_vec(self):
         param = {
@@ -533,18 +536,32 @@ class Guahao(object):
         if self.start_time > cur_time:
             seconds = (self.start_time - cur_time).total_seconds()
             logging.info("距离放号时间还有" + str(seconds) + "秒")
+            hour = seconds // 3600
+            minute = (seconds % 3600) // 60
+            second = seconds % 60
+            logging.info("距离放号时间还有"+str(int(hour))+" h " + str(int(minute))+" m "+ str(int(second))+ " s")
+
             sleep_time = seconds - 60
             if sleep_time > 0:
                 logging.info("程序休眠" + str(sleep_time) + "秒后开始运行")
-                time.sleep(sleep_time)
+                #  time.sleep(sleep_time)
+
+                if sleep_time > 3600:
+                    sleep_time -= 60
+                    for i in trange(1000):
+                        for j in trange(int(sleep_time/1000), leave=False, unit_scale=True):
+                            time.sleep(1)
+                else:
+                    for i in tqdm(range(int(sleep_time)-60)):
+                        time.sleep(1)
+
                 # 自动重新登录
                 self.auth_login()
-        pass
 
     def run(self):
         """主逻辑"""
         self.get_duty_time()
-        self.auth_login()                       # 1. 登陆
+        self.auth_login()                       # 1. 登录
         self.lazy()
         self.calendar_vec()
         self.get_patient_id()                   # 2. 获取病人id
