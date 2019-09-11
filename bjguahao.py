@@ -14,6 +14,7 @@ import logging
 from lib.prettytable import PrettyTable
 import base64
 from Crypto.Cipher import AES
+from tqdm import tqdm, trange
 
 
 if sys.version_info.major != 3:
@@ -506,13 +507,27 @@ class Guahao(object):
         if self.start_time > cur_time:
             seconds = (self.start_time - cur_time).total_seconds()
             logging.info("距离放号时间还有" + str(seconds) + "秒")
+            hour = seconds // 3600
+            minute = (seconds % 3600) // 60
+            second = seconds % 60
+            logging.info("距离放号时间还有"+str(int(hour))+" h " + str(int(minute))+" m "+ str(int(second))+ " s")
+
             sleep_time = seconds - 60
             if sleep_time > 0:
                 logging.info("程序休眠" + str(sleep_time) + "秒后开始运行")
-                time.sleep(sleep_time)
+                #  time.sleep(sleep_time)
+
+                if sleep_time > 3600:
+                    sleep_time -= 60
+                    for i in trange(1000):
+                        for j in trange(int(sleep_time/1000), leave=False, unit_scale=True):
+                            time.sleep(1)
+                else:
+                    for i in tqdm(range(int(sleep_time)-60)):
+                        time.sleep(1)
+
                 # 自动重新登录
                 self.auth_login()
-        pass
 
     def run(self):
         """主逻辑"""
