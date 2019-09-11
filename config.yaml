@@ -22,7 +22,7 @@ departmentId: "200002248"
 # 4. 其中 200002248 是 departmentId
 
 
-# 需要挂早上的号请填写1  需要挂下午的号请填写2
+# 需要挂早上的号请填写1  需要挂下午的号请填写2  上下午均可填写0
 dutyCode: "1"
 
 # patientName: 患者姓名
@@ -47,6 +47,17 @@ doctorName:
   - "扁鹊"
   - "华佗"
   - "杨永信"
+
+# 指定医生
+# false:默认不指定
+# true:只挂指定医生的号
+assign: "false"
+
+#true:检索每天余票
+remaining: "false"
+
+#remaining=true时,默认检索工作日,周末:6,7
+week: "1,2,3,4,5"
 
 #挂号类型是否为儿童号
 # 可选项为"true" 或者 "false"

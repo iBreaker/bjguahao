@@ -95,6 +95,17 @@ doctorName:
   - "华佗"
   - "杨永信"
 
+# 指定医生
+# false:默认不指定
+# true:只挂指定医生的号
+assign: "false"
+
+#true:检索每天余票
+remaining: "false"
+
+#remaining=true时,默认检索工作日,周末:6,7
+week: "1,2,3,4,5"
+
 #挂号类型是否为儿童号
 children: "false"
 
