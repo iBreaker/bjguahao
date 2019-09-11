@@ -56,8 +56,8 @@ assign: "false"
 #true:检索每天余票
 remaining: "false"
 
-#remaining=true时,默认检索工作日,周末:六,日
-week: "一,二,三,四,五"
+#remaining=true时,默认检索工作日,周末:6,7
+week: "1,2,3,4,5"
 
 #挂号类型是否为儿童号
 # 可选项为"true" 或者 "false"
