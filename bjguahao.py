@@ -348,22 +348,28 @@ class Guahao(object):
         if self.config.assign == 'true':
             for doctor_conf in self.config.doctorName:
                 for doctor in doctors:
-                    if doctor["doctorName"] == doctor_conf and (doctor['totalCount']):
-                        logging.info("选中:" + str(doctor["doctorName"]))
+                    if self.get_doctor_name(doctor) == doctor_conf and (doctor['totalCount']):
+                        logging.info("选中:" + self.get_doctor_name(doctor))
                         return doctor
             return "NoDuty"
         # 按照配置优先级选择医生
         for doctor_conf in self.config.doctorName:
             for doctor in doctors:
-                if doctor["doctorName"] == doctor_conf and doctor['totalCount']:
+                if self.get_doctor_name(doctor) == doctor_conf and doctor['totalCount']:
                     return doctor
 
         # 若没有合适的医生，默认返回最好的医生
         for doctor in doctors:
             if doctor['totalCount']:
-                logging.info("选中:" + str(doctor["doctorName"]))
+                logging.info("选中:" + self.get_doctor_name(doctor))
                 return doctor
         return "NoDuty"
+
+    def get_doctor_name(self,doctor):
+        if doctor['doctorName'] is not None:
+            return str(doctor['doctorName'])
+        else:
+            return str(doctor['doctorTitleName'])
 
     def print_doctor(self):
         logging.info("当前号余量:")
@@ -371,7 +377,7 @@ class Guahao(object):
         x.border = True
         x.field_names = ["医生姓名", "擅长", "号余量"]
         for doctor in self.dutys:
-            x.add_row([doctor["doctorName"], doctor['doctorSkill'], doctor['totalCount']])
+            x.add_row([self.get_doctor_name(doctor), doctor['doctorSkill'], doctor['totalCount']])
         print(x.get_string())
         pass
 
