@@ -4,7 +4,7 @@
 ![](https://img.shields.io/badge/license-GPLv3-000000.svg)
 ![](https://img.shields.io/badge/made%20with-%3C3-red.svg)
 
-Copyright (C) 2017
+Copyright (C) 2017-2019
 
 **目前稳定版已经发布，欢迎吐槽和试用**
 
@@ -167,7 +167,9 @@ useQPython3: "false"
 
 感谢 [cxl008](https://github.com/cxl008) 更新登录以及获取验证码代码
 
-若遗漏了您，请发邮件通知我 <791628659@qq.com>
+感谢 [haoming06](https://github.com/haoming06) 支持挂指定大夫号、可监测每天余号,捡漏等功能 [pull#96](https://github.com/iBreaker/bjguahao/pull/96)、[pull#99](https://github.com/iBreaker/bjguahao/pull/99)
+
+若遗漏了您，请发邮件通知我 <791628659#qq.com>
 
 ## 协议
 
