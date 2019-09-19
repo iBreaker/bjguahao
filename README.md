@@ -145,7 +145,7 @@ useQPython3: "false"
 
 ## 挂号攻略
 
-[攻略](tips.md) 中有详细的挂号攻略, 感谢[@lily0101](https://github.com/lily0101)提供
+[攻略](tips.md) 中有详细的挂号攻略, 感谢[@lily0101](https://github.com/lily0101)、[@Ryan-Shang](https://github.com/Ryan-Shang)提供
 
 ## 调试
 
