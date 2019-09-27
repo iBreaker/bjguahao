@@ -437,7 +437,10 @@ class Guahao(object):
                 "hospitalCardId": hospital_card_id,
                 "mapDutySourceId":"",
                 "smsCode": sms_code,
-                "mobileNo": self.config.mobile_no
+                "mobileNo": self.config.mobile_no,
+                "feeColor":"",
+                "fcode":"",
+                "dutyImgType":"",
             }
         #save order 
         response = self.browser.post(self.confirm_url, data=payload)
