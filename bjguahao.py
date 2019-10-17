@@ -190,6 +190,7 @@ class Guahao(object):
         self.query_hospital_url = "http://www.114yygh.com/web/queryHospitalById"
         self.calendar = "http://www.114yygh.com/web/product/list"
         self.order_patient_list = "http://www.114yygh.com/web/patient/orderPatientList"
+        self.appoint_info_url = "http://www.114yygh.com/web/order/getAppointInfo"
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
@@ -381,6 +382,34 @@ class Guahao(object):
         print(x.get_string())
         pass
 
+    def get_fee(self,doctor):
+        """
+        获取确切挂号费显示数值
+        """
+        hospital_id = self.config.hospital_id
+        department_id = self.config.department_id
+        doctor_id = str(doctor['doctorId'])
+        duty_source_id = str(doctor['dutySourceId'])
+
+        payload = {
+            'hospitalId': hospital_id,
+            'departmentId': department_id,
+            'doctorId': doctor_id,
+            'dutySourceId': duty_source_id
+        }
+        response = self.browser.post(self.appoint_info_url, data=payload)
+        logging.debug("response data:" + response.text)
+        try:
+            data = json.loads(response.text)
+            if data["resCode"] == 0:
+                purpose_data = data["data"]
+                total_fee = str(purpose_data['totalFee'])
+                logging.debug("真实挂号费用显示值:" + total_fee)
+                return total_fee
+        except Exception as e:
+            logging.error(e)
+            sys.exit()
+        
     def get_it(self, doctor, sms_code):
         """
         挂号
@@ -393,6 +422,7 @@ class Guahao(object):
         medicare_card_id = self.config.medicare_card_id
         reimbursement_type = self.config.reimbursement_type
         doctor_id = str(doctor['doctorId'])
+        total_fee = self.get_fee(doctor)
         #新版可能不区分儿童与成人,需测试
         if self.config.children == 'true':
             cid_type = self.config.cid_type
@@ -427,7 +457,8 @@ class Guahao(object):
                 "patientId": patient_id,
                 "dutyDate": doctor['dutyDate'],
                 "dutyCode": doctor['dutyCode'],
-                "totalFee":doctor['totalFee'],
+                "totalFee": total_fee,
+                "fcode":"",
                 "period":"",
                 "mapDepartmentId":"",
                 "mapDoctorId":"",
@@ -439,8 +470,7 @@ class Guahao(object):
                 "smsCode": sms_code,
                 "mobileNo": self.config.mobile_no,
                 "feeColor":"",
-                "fcode":"",
-                "dutyImgType":"",
+                "dutyImgType":""
             }
         #save order 
         response = self.browser.post(self.confirm_url, data=payload)
