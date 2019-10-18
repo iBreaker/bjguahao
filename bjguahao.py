@@ -190,6 +190,7 @@ class Guahao(object):
         self.query_hospital_url = "http://www.114yygh.com/web/queryHospitalById"
         self.calendar = "http://www.114yygh.com/web/product/list"
         self.order_patient_list = "http://www.114yygh.com/web/patient/orderPatientList"
+        self.appoint_info_url = "http://www.114yygh.com/web/order/getAppointInfo"
 
         self.config = Config(config_path)                       # config对象
         if self.config.useIMessage == 'true':
@@ -381,7 +382,35 @@ class Guahao(object):
         print(x.get_string())
         pass
 
-    def get_it(self, doctor, sms_code):
+    def get_fee(self,doctor):
+        """
+        获取真实挂号费显示数值
+        """
+        hospital_id = self.config.hospital_id
+        department_id = self.config.department_id
+        doctor_id = str(doctor['doctorId'])
+        duty_source_id = str(doctor['dutySourceId'])
+
+        payload = {
+            'hospitalId': hospital_id,
+            'departmentId': department_id,
+            'doctorId': doctor_id,
+            'dutySourceId': duty_source_id
+        }
+        response = self.browser.post(self.appoint_info_url, data=payload)
+        logging.debug("response data:" + response.text)
+        try:
+            datas = json.loads(response.text)
+            if datas["resCode"] == 0:
+                data = datas["data"]
+                total_fee = str(data['totalFee'])
+                logging.debug("真实挂号费显示值:" + total_fee)
+                return total_fee
+        except Exception as e:
+            logging.error(e)
+            sys.exit()
+        
+    def get_it(self, doctor, sms_code, total_fee):
         """
         挂号
         """
@@ -427,7 +456,8 @@ class Guahao(object):
                 "patientId": patient_id,
                 "dutyDate": doctor['dutyDate'],
                 "dutyCode": doctor['dutyCode'],
-                "totalFee":doctor['totalFee'],
+                "totalFee": total_fee,
+                "fcode":"",
                 "period":"",
                 "mapDepartmentId":"",
                 "mapDoctorId":"",
@@ -439,8 +469,7 @@ class Guahao(object):
                 "smsCode": sms_code,
                 "mobileNo": self.config.mobile_no,
                 "feeColor":"",
-                "fcode":"",
-                "dutyImgType":"",
+                "dutyImgType":""
             }
         #save order 
         response = self.browser.post(self.confirm_url, data=payload)
@@ -593,11 +622,12 @@ class Guahao(object):
                 logging.info("好像还没放号？重试中")
                 time.sleep(1)
             else:
+                total_fee = self.get_fee(doctor)                                # 获取挂号费,需在获取验证码之前
                 sms_code = self.get_sms_verify_code('ORDER_CODE')               # 获取验证码
                 print('sms_code:',sms_code)
                 if sms_code is None:
                     time.sleep(1)
-                result = self.get_it(doctor, sms_code)              # 4.挂号
+                result = self.get_it(doctor, sms_code, total_fee)              # 4.挂号
                 if result:
                     break                                           # 挂号成功
 
