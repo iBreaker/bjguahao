@@ -171,6 +171,8 @@ useQPython3: "false"
 
 感谢 [haoming06](https://github.com/haoming06) 支持挂指定大夫号、可监测每天余号,捡漏等功能 [pull#96](https://github.com/iBreaker/bjguahao/pull/96)、[pull#99](https://github.com/iBreaker/bjguahao/pull/99)
 
+感谢 [lann-zh](https://github.com/lann-zh) 修改totalFee获取方式、修改接口调用 [pull#110]
+
 若遗漏了您，请发邮件通知我 <791628659#qq.com>
 
 ## 协议
