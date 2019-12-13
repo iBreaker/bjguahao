@@ -15,6 +15,7 @@ from lib.prettytable import PrettyTable
 import base64
 from Crypto.Cipher import AES
 from tqdm import tqdm, trange
+import msg
 
 
 if sys.version_info.major != 3:
@@ -556,6 +557,8 @@ class Guahao(object):
                 code = self.imessage.get_verify_code()
             elif self.qpython3 is not None: # 如果使用 QPython3
                 code = self.qpython3.get_verify_code()
+            elif msg is not None:
+                code = msg.get_verify_code()
             else:
                 code = input("输入短信验证码: ")
             return code
@@ -633,7 +636,6 @@ class Guahao(object):
 
 
 if __name__ == "__main__":
-
     if (len(sys.argv) == 3) and (sys.argv[1] == '-c') and (isinstance(sys.argv[2], str)):
         config_path = sys.argv[2]
         guahao = Guahao(config_path)
