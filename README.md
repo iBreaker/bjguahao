@@ -62,9 +62,6 @@ Copyright (C) 2017-2019
 # username: 您的的用户名(一般是手机号码)
 username: "13888888888"
 
-# password: 密码
-password: "*****"
-
 # date: 挂号日期
 date: "2018-01-01"
 
