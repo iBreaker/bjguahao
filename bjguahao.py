@@ -60,7 +60,6 @@ class Config(object):
                                     datefmt='%a, %d %b %Y %H:%M:%S')
 
                 self.mobile_no = data["username"]
-                self.password = data["password"]
                 self.date = data["date"]
                 self.hospital_id = data["hospitalId"]
                 self.department_id = data["departmentId"]

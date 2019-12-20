@@ -83,7 +83,6 @@ departmentId: "200002248"
 dutyCode: "1"
 
 # patientName: 患者姓名
-# 若是自己挂号可为空
 patientName: "曹操"
 
 # doctorName: 医生姓名
